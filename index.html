@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALMOXARIFADO MASTER V7.2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root { --vinho: #4d0011; --vinho-light: #7a001b; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        .bg-vinho { background-color: var(--vinho); }
+        .text-vinho { color: var(--vinho); }
+        .btn-vinho { background-color: var(--vinho); color: white; transition: 0.3s; font-weight: bold; padding: 10px; border-radius: 8px; }
+        .btn-vinho:hover { background-color: var(--vinho-light); }
+        .status-vermelho { color: #a4161a; background: #ffcccb; padding: 4px 10px; border-radius: 15px; font-weight: bold; animation: pulse 1.5s infinite; }
+        .status-amarelo { color: #856404; background: #fff3cd; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
+        .status-verde { color: #2d6a4f; background: #d8f3dc; padding: 4px 10px; border-radius: 15px; font-weight: bold; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .hidden { display: none; }
+        .search-results { position: absolute; z-index: 50; width: 100%; background: white; border: 1px solid #ddd; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen" class="fixed inset-0 bg-vinho z-50 flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-2xl w-80 text-center">
+        <h2 class="text-vinho font-black mb-4 uppercase text-xl">Gestão Almoxarifado</h2>
+        <input type="password" id="pin-input" placeholder="DIGITE O PIN" class="w-full border-2 border-vinho p-2 mb-4 text-center text-2xl outline-none rounded">
+        <button onclick="autenticar()" class="w-full btn-vinho uppercase">Entrar</button>
+    </div>
+</div>
+
+<div id="app" class="hidden p-4">
+    <header class="bg-vinho text-white p-4 rounded-xl mb-6 flex justify-between items-center shadow-lg">
+        <div>
+            <h1 class="text-xl font-black uppercase tracking-tight">Master Control <span class="text-red-400 text-sm">V7.2</span></h1>
+            <p id="clock" class="text-xs font-mono opacity-80"></p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="gerarRelatorioPDF()" class="bg-white text-vinho px-4 py-2 rounded font-bold text-xs uppercase shadow-sm hover:bg-gray-100 transition">PDF por Setor</button>
+            <button onclick="fazerBackup('Manual')" class="bg-gray-700 text-white px-4 py-2 rounded text-xs uppercase">Backup</button>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-4 space-y-6">
+            
+            <div class="bg-white p-6 rounded-xl shadow border-t-4 border-vinho">
+                <h3 id="form-title" class="font-black text-vinho mb-4 uppercase">📝 Cadastro / Edição</h3>
+                <input type="hidden" id="edit-id">
+                <div class="space-y-3">
+                    <input type="text" id="p-nome" placeholder="Nome do Item" class="w-full border p-2 rounded outline-none focus:border-vinho">
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="p-tipo" class="border p-2 rounded bg-gray-50">
+                            <option value="Insumo">Insumo (📦)</option>
+                            <option value="Ferramenta">Ferramenta (🛠️)</option>
+                        </select>
+                        <input type="number" id="p-min" placeholder="Mínimo Alerta" class="border p-2 rounded outline-none">
+                    </div>
+                    <div id="div-qtd-inicial">
+                        <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-2 rounded outline-none">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 btn-vinho">SALVAR</button>
+                        <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-400 text-white px-4 rounded">X</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow border-t-4 border-red-500">
+                <h3 class="font-black text-red-700 mb-4 uppercase">⚡ Saída / Entrada</h3>
+                <div class="space-y-3 relative">
+                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 Buscar item..." class="w-full border-2 border-gray-200 p-2 rounded font-bold outline-none focus:border-red-500">
+                    <div id="lista-busca" class="search-results hidden shadow-xl rounded-b-lg"></div>
+                    <input type="hidden" id="m-id-selecionado">
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="m-op" onchange="toggleInputs()" class="border p-2 rounded bg-white">
+                            <option value="saida">SAÍDA (-)</option>
+                            <option value="entrada">ENTRADA (+)</option>
+                        </select>
+                        <input type="number" id="m-qtd" placeholder="Qtd" class="border p-2 rounded font-bold">
+                    </div>
+
+                    <div id="extra-saida" class="space-y-2">
+                        <input type="text" id="m-nome" placeholder="Nome do Funcionário" class="w-full border p-2 rounded">
+                        <select id="m-setor" class="w-full border p-2 rounded">
+                            <option value="">Selecione o Setor</option>
+                            <option>Setor 1</option>
+                            <option>Setor 2</option>
+                            <option>Limpeza de Estofados</option>
+                            <option>Futtons</option>
+                            <option>Pintura</option>
+                            <option>Marcenaria</option>
+                            <option>Reparo</option>
+                            <option>Forração</option>
+                            <option>Solda</option>
+                            <option>Cozinha</option>
+                            <option>Limpeza</option>
+                            <option>Escritório</option>
+                            <option>Outros</option>
+                        </select>
+                    </div>
+                    <button onclick="executarMovimento()" class="w-full bg-green-700 text-white p-3 rounded font-black uppercase hover:bg-green-800 transition">Registrar Movimento</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8 bg-white rounded-xl shadow overflow-hidden border-t-4 border-vinho">
+            <div class="p-4 bg-gray-50 border-b">
+                <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 Pesquisar no estoque atual..." class="w-full p-2 border rounded shadow-sm outline-none">
+            </div>
+            <div class="overflow-y-auto" style="max-height: 600px;">
+                <table class="w-full text-sm">
+                    <thead class="bg-vinho text-white sticky top-0 uppercase text-xs">
+                        <tr>
+                            <th class="p-4 text-left">Item</th>
+                            <th class="p-4">Saldo</th>
+                            <th class="p-4">Status / Alerta</th>
+                            <th class="p-4 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-corpo"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const PIN = "0000";
+    let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
+    let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
+
+    setInterval(() => {
+        const agora = new Date();
+        const horaMinuto = agora.getHours().toString().padStart(2, '0') + ":" + agora.getMinutes().toString().padStart(2, '0');
+        document.getElementById('clock').innerText = agora.toLocaleString('pt-BR');
+    }, 1000);
+
+    function autenticar() {
+        if(document.getElementById('pin-input').value === PIN) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            render();
+        } else { alert("PIN INVÁLIDO"); }
+    }
+
+    function buscarItemMovimento(valor) {
+        const lista = document.getElementById('lista-busca');
+        if (valor.length < 1) { lista.classList.add('hidden'); return; }
+        const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(valor.toLowerCase()));
+        lista.innerHTML = '';
+        filtrados.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'p-3 hover:bg-vinho hover:text-white cursor-pointer border-b flex justify-between font-bold';
+            div.innerHTML = `<span>${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</span> <span>Estoque: ${p.qtd}</span>`;
+            div.onclick = () => {
+                document.getElementById('m-id-selecionado').value = p.id;
+                document.getElementById('m-busca-item').value = p.nome;
+                lista.classList.add('hidden');
+            };
+            lista.appendChild(div);
+        });
+        lista.classList.remove('hidden');
+    }
+
+    function salvarProduto() {
+        const id = document.getElementById('edit-id').value;
+        const nome = document.getElementById('p-nome').value;
+        const tipo = document.getElementById('p-tipo').value;
+        const min = parseInt(document.getElementById('p-min').value) || 0;
+        const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
+
+        if(!nome) return alert("Preencha o nome!");
+
+        if(id) {
+            const idx = produtos.findIndex(p => p.id == id);
+            produtos[idx] = { ...produtos[idx], nome, tipo, min };
+            cancelarEdicao();
+        } else {
+            produtos.push({ id: Date.now(), nome, tipo, min, qtd, emUso: 0 });
+        }
+        salvar();
+    }
+
+    function editarItem(id) {
+        const p = produtos.find(p => p.id == id);
+        document.getElementById('edit-id').value = p.id;
+        document.getElementById('p-nome').value = p.nome;
+        document.getElementById('p-tipo').value = p.tipo;
+        document.getElementById('p-min').value = p.min;
+        document.getElementById('div-qtd-inicial').classList.add('hidden');
+        document.getElementById('form-title').innerText = "✏️ Editando: " + p.nome;
+        document.getElementById('btn-cancelar').classList.remove('hidden');
+        window.scrollTo(0,0);
+    }
+
+    function cancelarEdicao() {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('p-nome').value = "";
+        document.getElementById('div-qtd-inicial').classList.remove('hidden');
+        document.getElementById('form-title').innerText = "📝 Cadastro / Edição";
+        document.getElementById('btn-cancelar').classList.add('hidden');
+    }
+
+    function executarMovimento() {
+        const id = document.getElementById('m-id-selecionado').value;
+        const op = document.getElementById('m-op').value;
+        const qtd = parseInt(document.getElementById('m-qtd').value);
+        const setor = document.getElementById('m-setor').value;
+        const nome = document.getElementById('m-nome').value;
+
+        if(!id || !qtd) return alert("Selecione o item e informe a quantidade!");
+
+        const p = produtos.find(item => item.id == id);
+        if(op === 'saida') {
+            if(p.qtd < qtd) return alert("Saldo insuficiente em estoque!");
+            p.qtd -= qtd;
+            if(p.tipo === 'Ferramenta') p.emUso = (p.emUso || 0) + qtd;
+            logs.push({ data: new Date().toLocaleString(), tipo: 'SAÍDA', prod: p.nome, qtd, setor, resp: nome });
+        } else {
+            p.qtd += qtd;
+            logs.push({ data: new Date().toLocaleString(), tipo: 'ENTRADA', prod: p.nome, qtd, setor: 'ALMOX', resp: 'Entrada manual' });
+        }
+        salvar();
+        document.getElementById('m-busca-item').value = '';
+        document.getElementById('m-qtd').value = '';
+    }
+
+    function render() {
+        const busca = document.getElementById('busca-geral').value.toLowerCase();
+        const corpo = document.getElementById('lista-corpo');
+        corpo.innerHTML = '';
+
+        produtos.forEach(p => {
+            if(p.nome.toLowerCase().includes(busca)) {
+                let statusClass = "status-verde";
+                let statusTexto = "EM DIA";
+                
+                if(p.qtd <= p.min) { statusClass = "status-vermelho"; statusTexto = "REPOR"; }
+                if(p.tipo === 'Ferramenta' && p.emUso > 0) { statusTexto = `USO: ${p.emUso}`; statusClass = "status-amarelo"; }
+
+                corpo.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-4 font-bold text-vinho">${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</td>
+                        <td class="p-4 text-center font-black text-lg">${p.qtd}</td>
+                        <td class="p-4 text-center"><span class="${statusClass}">${statusTexto}</span></td>
+                        <td class="p-4 text-right">
+                            <div class="flex flex-col gap-1 items-end">
+                                <button onclick="editarItem(${p.id})" class="text-blue-600 font-bold hover:underline">EDITAR</button>
+                                ${p.emUso > 0 ? `<label class="text-[10px] font-bold text-orange-600 cursor-pointer"><input type="checkbox" onchange="devolverRapido(${p.id})"> DEVOLVER</label>` : ''}
+                                <button onclick="excluir(${p.id})" class="text-gray-300 hover:text-red-600 text-[10px]">REMOVER</button>
+                            </div>
+                        </td>
+                    </tr>`;
+            }
+        });
+    }
+
+    function devolverRapido(id) {
+        const p = produtos.find(item => item.id == id);
+        p.emUso--;
+        p.qtd++;
+        logs.push({ data: new Date().toLocaleString(), tipo: 'DEVOLUÇÃO', prod: p.nome, qtd: 1, setor: 'ALMOX', resp: 'Devolução' });
+        salvar();
+    }
+
+    function excluir(id) {
+        if(confirm("Confirmar exclusão definitiva do item?")) {
+            produtos = produtos.filter(p => p.id != id);
+            salvar();
+        }
+    }
+
+    function salvar() {
+        localStorage.setItem('almox_final_prods', JSON.stringify(produtos));
+        localStorage.setItem('almox_final_logs', JSON.stringify(logs));
+        render();
+    }
+
+    function fazerBackup(horario) {
+        const data = { prods: produtos, logs: logs };
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `ALMOX_BKP_${horario}.json`;
+        a.click();
+    }
+
+    function gerarRelatorioPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(14); doc.setTextColor(77, 0, 17);
+        doc.text("RELATÓRIO POR SETOR - ALMOXARIFADO", 14, 20);
+        
+        const setores = [...new Set(logs.filter(l => l.tipo === 'SAÍDA').map(l => l.setor))];
+        let y = 30;
+
+        setores.forEach(s => {
+            const itens = logs.filter(l => l.setor === s && l.tipo === 'SAÍDA').map(l => [l.data, l.prod, l.qtd, l.resp]);
+            doc.setFontSize(10); doc.setTextColor(0);
+            doc.text(`SETOR: ${s || 'NÃO DEFINIDO'}`, 14, y);
+            doc.autoTable({ head: [['Data', 'Item', 'Qtd', 'Responsável']], body: itens, startY: y+2, theme: 'grid', headStyles: {fillColor:[77,0,17]}, styles: {fontSize: 8} });
+            y = doc.lastAutoTable.finalY + 10;
+            if(y > 270) { doc.addPage(); y = 20; }
+        });
+        doc.save("Relatorio_Setores.pdf");
+    }
+</script>
+</body>
+</html>
