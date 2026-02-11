@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V8.7 - J. GUILHERME</title>
+    <title>ALMOXARIFADO INTELLIGENT V8.8 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -19,15 +19,14 @@
         .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
         .hidden { display: none; }
-        input, select { border-radius: 10px !important; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
     <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V8.7</h2>
-        <p class="text-gray-400 text-xs mb-8 font-bold">Produced by J Guilherme A.C.</p>
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V8.8</h2>
+        <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
         <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
         <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
     </div>
@@ -41,11 +40,11 @@
         </div>
         
         <div class="flex flex-wrap items-center bg-white/10 p-3 rounded-2xl gap-3">
-            <div class="text-[10px] font-bold uppercase">Período PDF:</div>
+            <div class="text-[10px] font-bold uppercase">PDF Custom:</div>
             <input type="date" id="filtro-inicio" class="text-black text-xs p-1 rounded">
             <span class="text-xs">até</span>
             <input type="date" id="filtro-fim" class="text-black text-xs p-1 rounded">
-            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg hover:bg-gray-100 transition">📊 Gerar PDF</button>
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg hover:bg-gray-100 transition">📊 Gerar Relatório</button>
         </div>
 
         <div class="flex gap-2">
@@ -57,19 +56,19 @@
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Reposição Urgente</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Reposição Urgente</p>
             <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Movimentos (7d)</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Movimentos (7d)</p>
             <h2 id="dash-saidas" class="text-3xl font-black text-blue-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Total em Peças</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Total em Peças</p>
             <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Ferramentas em Uso</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Ferramentas Fora</p>
             <h2 id="dash-uso" class="text-3xl font-black text-amber-500">0</h2>
         </div>
     </div>
@@ -97,7 +96,7 @@
             </div>
 
             <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Atividades Recentes</h3>
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Linha do Tempo</h3>
                 <div id="historico-lista" class="space-y-3 mb-6"></div>
 
                 <h3 class="font-black text-vinho mb-4 text-xs uppercase italic border-t pt-4">Movimentar</h3>
@@ -116,24 +115,24 @@
                 <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
                 <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold">
                     <option value="">-- SELECIONE O SETOR --</option>
-                    <option>MONTAGEM</option><option>Setor 1</option><option>Setor 2</option>
-                    <option>Limpeza de Estofados</option><option>Futtons</option><option>Pintura</option>
-                    <option>Marcenaria</option><option>Reparo</option><option>Forração</option>
-                    <option>Solda</option><option>Escritório</option>
+                    <option>MONTAGEM</option>
+                    <option>Setor 1</option><option>Setor 2</option><option>Limpeza de Estofados</option>
+                    <option>Futtons</option><option>Pintura</option><option>Marcenaria</option>
+                    <option>Reparo</option><option>Forração</option><option>Solda</option><option>Escritório</option>
                 </select>
-                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Registro</button>
+                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Agora</button>
             </div>
         </div>
 
         <div class="lg:col-span-8 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-6 bg-gray-50/50 border-b">
-                <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 PESQUISAR EM TODO O ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100">
+                <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 BUSCAR NO ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100">
             </div>
             <div class="overflow-x-auto px-4 pb-4">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="text-[10px] uppercase text-gray-400 font-black tracking-widest">
-                            <th class="p-4">Descrição do Material</th>
+                            <th class="p-4">Material</th>
                             <th class="p-4 text-center">Saldo</th>
                             <th class="p-4 text-center">Status</th>
                             <th class="p-4 text-right">Ação</th>
@@ -198,8 +197,8 @@
         const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(v.toLowerCase()));
         lista.innerHTML = '';
         filtrados.forEach(p => {
-            const div = document.createElement('div');
             const ico = p.tipo === 'Ferramenta' ? '🛠️' : '📦';
+            const div = document.createElement('div');
             div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold';
             div.innerHTML = `<span>${ico} ${p.nome}</span><span class="text-[10px] bg-vinho text-white px-2 py-1 rounded">QTD: ${p.qtd}</span>`;
             div.onclick = () => {
@@ -235,6 +234,7 @@
         const busca = document.getElementById('busca-geral').value.toLowerCase();
         const corpo = document.getElementById('lista-corpo');
         const histDiv = document.getElementById('historico-lista');
+        
         produtos.sort((a, b) => (a.qtd <= a.min ? -1 : 1) || a.nome.localeCompare(b.nome));
         corpo.innerHTML = '';
         let criticos = 0, totalP = 0, emUso = 0;
@@ -245,12 +245,15 @@
             if(p.nome.toLowerCase().includes(busca)) {
                 let sCls = "bg-green-100 text-green-700", sTxt = "ESTOQUE OK";
                 if(p.qtd <= p.min) { sCls = "status-vermelho"; sTxt = "REPOR"; criticos++; }
-                const ico = p.tipo === 'Ferramenta' ? '🛠️' : '📦';
+                
+                // --- LINHA CORRIGIDA: ÍCONE VOLTOU ---
+                const icoTabela = (p.tipo === 'Ferramenta' || p.tipo === '🛠️') ? '🛠️' : '📦';
+                
                 corpo.innerHTML += `
                     <tr class="border-b border-gray-50">
                         <td class="p-4 font-black text-gray-700 text-sm">
-                            <span class="mr-2">${ico}</span>${p.nome} 
-                            <br><span class="text-[9px] text-gray-300 font-normal">MIN: ${p.min}</span>
+                            <span class="mr-2">${icoTabela}</span>${p.nome} 
+                            <br><span class="text-[9px] text-gray-300 font-normal tracking-tighter">ESTOQUE MÍNIMO: ${p.min}</span>
                         </td>
                         <td class="p-4 text-center font-black text-xl text-vinho">${p.qtd}</td>
                         <td class="p-4 text-center"><span class="text-[9px] px-3 py-1 rounded-lg font-bold ${sCls}">${sTxt}</span></td>
@@ -266,10 +269,10 @@
 
         const ultimos = logs.slice(-5).reverse();
         histDiv.innerHTML = ultimos.map(l => {
-            const ico = l.prodTipo === 'Ferramenta' ? '🛠️' : '📦';
+            const icoHist = (l.prodTipo === 'Ferramenta' || l.prodTipo === '🛠️') ? '🛠️' : '📦';
             return `
             <div class="flex items-center justify-between text-[10px] bg-gray-50 p-2 rounded-lg border-l-4 ${l.tipo === 'SAIDA' ? 'border-red-500' : 'border-green-500'}">
-                <div>${ico} <span class="font-bold uppercase">${l.tipo}</span>: ${l.prod} (${l.qtd})</div>
+                <div>${icoHist} <span class="font-bold uppercase">${l.tipo}</span>: ${l.prod} (${l.qtd})</div>
                 <div class="text-gray-400 font-mono italic text-[9px]">${l.data.split(', ')[1]}</div>
             </div>`;
         }).join('') || '<p class="text-[10px] text-gray-400">Sem atividades recentes.</p>';
@@ -306,7 +309,7 @@
         const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `ALMOX_BKP_${new Date().toLocaleDateString()}.json`;
+        a.download = `BKP_V88_${new Date().toLocaleDateString()}.json`;
         a.click();
     }
 
@@ -327,12 +330,12 @@
         const dataFim = new Date(document.getElementById('filtro-fim').value + "T23:59:59").getTime();
         const lR = logs.filter(l => l.tipo === 'SAIDA' && l.t >= dataInicio && l.t <= dataFim);
 
-        if(lR.length === 0) return alert("Sem dados no período selecionado.");
+        if(lR.length === 0) return alert("Sem dados no período!");
 
         doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 45, 'F');
-        doc.setTextColor(255); doc.setFontSize(22); doc.text("BALANÇO ANALÍTICO DE ALMOXARIFADO", 15, 20);
+        doc.setTextColor(255); doc.setFontSize(22); doc.text("BALANÇO ANALÍTICO", 15, 20);
         doc.setFontSize(10); 
-        doc.text(`Período: ${new Date(dataInicio).toLocaleDateString()} até ${new Date(dataFim).toLocaleDateString()}`, 15, 30);
+        doc.text(`Período: ${new Date(dataInicio).toLocaleDateString()} a ${new Date(dataFim).toLocaleDateString()}`, 15, 30);
         doc.text(`Produced by J Guilherme A.C.`, 15, 38);
 
         const dadosSetor = {}; lR.forEach(l => dadosSetor[l.setor] = (dadosSetor[l.setor] || 0) + l.qtd);
@@ -341,27 +344,19 @@
 
         const dadosFunc = {}; lR.forEach(l => dadosFunc[l.resp] = (dadosFunc[l.resp] || 0) + l.qtd);
         const topFunc = Object.entries(dadosFunc).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        const chartFuncImg = await criarGraficoImg('canvasFunc', topFunc.map(f=>f[0]), topFunc.map(f=>f[1]), 'Top 5 Responsáveis (%)');
+        const chartFuncImg = await criarGraficoImg('canvasFunc', topFunc.map(f=>f[0]), topFunc.map(f=>f[1]), 'Top 5 Pessoas (%)');
         doc.addImage(chartFuncImg, 'PNG', 110, 55, 85, 65);
 
         let y = 130;
         const setores = [...new Set(lR.map(l => l.setor))];
         setores.forEach(s => {
             if(y > 240) { doc.addPage(); y = 20; }
-            doc.setTextColor(77,0,17); doc.setFontSize(12); doc.setFont(undefined, 'bold');
-            doc.text(`SETOR: ${s || 'N/A'}`, 15, y);
+            doc.setTextColor(77,0,17); doc.setFontSize(12); doc.text(`SETOR: ${s || 'N/A'}`, 15, y);
             const body = lR.filter(l => l.setor === s).map(l => [l.data, l.prod, l.qtd, l.resp]);
-            doc.autoTable({
-                startY: y + 3,
-                head: [['Data', 'Produto', 'Qtd', 'Quem']],
-                body: body,
-                theme: 'grid',
-                headStyles: {fillColor:[77,0,17]},
-                styles: {fontSize: 8}
-            });
+            doc.autoTable({ startY: y + 3, head: [['Data', 'Produto', 'Qtd', 'Quem']], body: body, theme: 'grid', headStyles: {fillColor:[77,0,17]}, styles: {fontSize: 8} });
             y = doc.lastAutoTable.finalY + 15;
         });
-        doc.save(`Relatorio_Almox_${new Date(dataInicio).toLocaleDateString()}.pdf`);
+        doc.save(`Relatorio_JGuilherme.pdf`);
     }
 
     function criarGraficoImg(canvasId, labels, data, title) {
@@ -369,17 +364,8 @@
             const ctx = document.getElementById(canvasId).getContext('2d');
             const chart = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: ['#4d0011', '#a4161a', '#e5383b', '#660708', '#343a40', '#800000']
-                    }]
-                },
-                options: {
-                    plugins: { title: { display: true, text: title, font: {size: 14} }, legend: { position: 'bottom', labels: { boxWidth: 12, font: {size: 9} } } },
-                    animation: false
-                }
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#4d0011', '#a4161a', '#e5383b', '#660708', '#343a40', '#800000'] }] },
+                options: { plugins: { title: { display: true, text: title, font: {size: 14} }, legend: { position: 'bottom', labels: { boxWidth: 12, font: {size: 9} } } }, animation: false }
             });
             setTimeout(() => { resolve(chart.toBase64Image()); chart.destroy(); }, 600);
         });
