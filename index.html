@@ -3,130 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V8.0</title>
+    <title>ALMOXARIFADO INTELLIGENT V8.5 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root { --vinho: #4d0011; }
-        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
         .bg-vinho { background-color: var(--vinho); }
         .text-vinho { color: var(--vinho); }
-        .status-vermelho { color: #fff; background: #dc2626; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
+        .status-vermelho { background: #dc2626; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .card-dash { background: white; padding: 15px; border-radius: 12px; border-left: 5px solid var(--vinho); shadow: sm; }
-        .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card-dash { background: white; padding: 15px; border-radius: 12px; border-left: 5px solid var(--vinho); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .signature { position: fixed; bottom: 10px; right: 20px; font-size: 9px; color: #cbd5e1; font-style: italic; letter-spacing: 1px; pointer-events: none; }
         .hidden { display: none; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
     <div class="bg-white p-8 rounded-2xl shadow-2xl w-80 text-center">
-        <h2 class="text-vinho font-black text-2xl mb-6 uppercase tracking-widest">Master V8</h2>
-        <input type="password" id="pin-input" placeholder="PIN DE ACESSO" class="w-full border-2 border-gray-200 p-3 mb-4 text-center text-2xl outline-none rounded-xl focus:border-vinho transition-all">
-        <button onclick="autenticar()" class="w-full bg-vinho text-white p-3 rounded-xl font-bold hover:opacity-90 transition">ENTRAR</button>
+        <h2 class="text-vinho font-black text-2xl mb-6 uppercase">Master V8.5</h2>
+        <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-3 mb-4 text-center text-2xl outline-none rounded-xl focus:border-vinho">
+        <button onclick="autenticar()" class="w-full bg-vinho text-white p-3 rounded-xl font-bold uppercase hover:opacity-95 transition">Acessar</button>
     </div>
 </div>
 
-<div id="app" class="hidden p-4 max-w-7xl mx-auto">
+<div id="app" class="hidden p-4 max-w-7xl mx-auto pb-10">
     <header class="bg-vinho text-white p-5 rounded-2xl mb-6 flex flex-col md:flex-row justify-between items-center shadow-xl gap-4">
-        <div class="text-center md:text-left">
+        <div>
             <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
             <p id="clock" class="text-sm font-mono opacity-70"></p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <button onclick="fazerBackup('Manual')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase shadow-lg transition">💾 Backup</button>
+            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase shadow-md">💾 Backup</button>
             <input type="file" id="import-f" onchange="importarBackup(event)" class="hidden">
-            <button onclick="document.getElementById('import-f').click()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase shadow-lg">📥 Restaurar</button>
-            <button onclick="gerarRelatorioInteligente()" class="bg-white text-vinho px-4 py-2 rounded-lg font-bold text-xs uppercase shadow-lg hover:scale-105 transition transform">📊 PDF Inteligente</button>
+            <button onclick="document.getElementById('import-f').click()" class="bg-slate-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase">📥 Restaurar</button>
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-lg font-bold text-xs uppercase shadow-md hover:scale-105 transition">📊 PDF Analítico</button>
         </div>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="card-dash">
-            <p class="text-gray-500 text-xs font-bold uppercase">Itens Críticos (Reposição)</p>
+            <p class="text-gray-400 text-[10px] font-bold uppercase">Reposição Urgente</p>
             <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-500 text-xs font-bold uppercase">Saídas Hoje</p>
+            <p class="text-gray-400 text-[10px] font-bold uppercase">Movimentos na Semana</p>
             <h2 id="dash-saidas" class="text-3xl font-black text-blue-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-500 text-xs font-bold uppercase">Setor Mais Ativo</p>
-            <h2 id="dash-setor" class="text-lg font-black text-gray-800">---</h2>
+            <p class="text-gray-400 text-[10px] font-bold uppercase">Setor em Destaque</p>
+            <h2 id="dash-setor" class="text-lg font-black text-gray-700 italic">---</h2>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-4 space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 id="form-title" class="font-black text-vinho mb-4 flex items-center gap-2">📝 CADASTRO DE ITEM</h3>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border">
+                <h3 id="form-title" class="font-black text-vinho mb-4 text-sm uppercase">📝 Cadastro de Produto</h3>
                 <input type="hidden" id="edit-id">
-                <div class="space-y-3">
-                    <input type="text" id="p-nome" placeholder="Nome do Produto" class="w-full border p-3 rounded-xl outline-none focus:ring-2 ring-vinho/20">
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50">
-                            <option value="Insumo">Insumo (📦)</option>
-                            <option value="Ferramenta">Ferramenta (🛠️)</option>
-                        </select>
-                        <input type="number" id="p-min" placeholder="Estoque Mín" class="border p-3 rounded-xl">
-                    </div>
-                    <div id="div-qtd-inicial">
-                        <input type="number" id="p-qtd" placeholder="Quantidade Inicial" class="w-full border p-3 rounded-xl">
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho text-white p-3 rounded-xl font-bold uppercase hover:brightness-125 transition">Salvar</button>
-                        <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-400 text-white px-4 rounded-xl font-bold">X</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-lg border-t-8 border-vinho">
-                <h3 class="font-black text-vinho mb-4 flex items-center gap-2">⚡ MOVIMENTAR ESTOQUE</h3>
-                <div class="space-y-3 relative">
-                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 Clique aqui e busque o item..." class="w-full border-2 border-vinho/30 p-4 rounded-xl font-bold outline-none focus:border-vinho">
-                    <div id="lista-busca" class="search-results hidden"></div>
-                    <input type="hidden" id="m-id-selecionado">
-                    
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="m-op" class="border p-3 rounded-xl font-bold bg-gray-50 text-vinho">
-                            <option value="saida">SAÍDA (-)</option>
-                            <option value="entrada">ENTRADA (+)</option>
-                        </select>
-                        <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl">
-                    </div>
-                    <input type="text" id="m-nome" placeholder="Nome de quem está pegando" class="w-full border p-3 rounded-xl">
-                    <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50">
-                        <option value="">Selecione o Setor Destino</option>
-                        <option>Setor 1</option><option>Setor 2</option><option>Limpeza de Estofados</option>
-                        <option>Futtons</option><option>Pintura</option><option>Marcenaria</option>
-                        <option>Reparo</option><option>Forração</option><option>Solda</option><option>Escritório</option>
+                <input type="text" id="p-nome" placeholder="NOME DO ITEM" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-1 ring-vinho">
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs">
+                        <option value="Insumo">Insumo (📦)</option>
+                        <option value="Ferramenta">Ferramenta (🛠️)</option>
                     </select>
-                    <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Saída</button>
+                    <input type="number" id="p-min" placeholder="Mínimo" class="border p-3 rounded-xl text-xs">
                 </div>
+                <div id="div-qtd-inicial" class="mb-3">
+                    <input type="number" id="p-qtd" placeholder="Saldo Inicial" class="w-full border p-3 rounded-xl">
+                </div>
+                <button onclick="salvarProduto()" id="btn-salvar" class="w-full bg-vinho text-white p-3 rounded-xl font-bold uppercase">Salvar Produto</button>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <h4 class="text-xs font-black text-gray-400 uppercase mb-3">Últimos Registros</h4>
-                <div id="log-rapido" class="text-[10px] space-y-2"></div>
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-t-8 border-vinho">
+                <h3 class="font-black text-vinho mb-4 text-sm uppercase italic underline">Saída de Material</h3>
+                <div class="relative">
+                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full border-2 border-vinho/20 p-4 rounded-xl font-black outline-none mb-3">
+                    <div id="lista-busca" class="search-results hidden"></div>
+                </div>
+                <input type="hidden" id="m-id-selecionado">
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <select id="m-op" class="border p-3 rounded-xl font-bold bg-gray-50"><option value="saida">SAÍDA</option><option value="entrada">ENTRADA</option></select>
+                    <input type="number" id="m-qtd" placeholder="QTD" class="border p-3 rounded-xl font-black text-center text-xl">
+                </div>
+                <input type="text" id="m-nome" placeholder="QUEM ESTÁ RETIRANDO?" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs">
+                <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs">
+                    <option value="">-- SELECIONE O SETOR --</option>
+                    <option>Setor 1</option><option>Setor 2</option><option>Limpeza de Estofados</option><option>Futtons</option>
+                    <option>Pintura</option><option>Marcenaria</option><option>Reparo</option><option>Forração</option>
+                    <option>Solda</option><option>Escritório</option>
+                </select>
+                <button onclick="executarMovimento()" class="w-full bg-green-700 text-white p-4 rounded-xl font-black uppercase shadow-lg">Confirmar Agora</button>
             </div>
         </div>
 
-        <div class="lg:col-span-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 Pesquisar no estoque completo..." class="bg-transparent outline-none font-bold text-vinho w-full">
-            </div>
+        <div class="lg:col-span-8 bg-white rounded-2xl shadow-sm border overflow-hidden">
+            <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 BUSCA RÁPIDA NO ESTOQUE..." class="w-full p-5 border-b outline-none font-bold text-vinho bg-gray-50">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-100 text-[10px] uppercase text-gray-500 font-bold">
-                            <th class="p-4">Descrição do Produto</th>
-                            <th class="p-4 text-center">Saldo Atual</th>
-                            <th class="p-4 text-center">Status</th>
-                            <th class="p-4 text-right">Ações</th>
-                        </tr>
+                <table class="w-full text-left">
+                    <thead class="bg-gray-100 text-[10px] uppercase text-gray-400">
+                        <tr><th class="p-4">Produto</th><th class="p-4 text-center">Saldo</th><th class="p-4 text-center">Status</th><th class="p-4 text-right">Ação</th></tr>
                     </thead>
                     <tbody id="lista-corpo"></tbody>
                 </table>
@@ -135,17 +115,16 @@
     </div>
 </div>
 
-<canvas id="chartSetor" class="hidden" width="400" height="200"></canvas>
-<canvas id="chartFunc" class="hidden" width="400" height="200"></canvas>
+<div class="signature">Produced by J Guilherme A.C.</div>
+
+<div style="position: absolute; left: -9999px;">
+    <canvas id="canvasSetor" width="300" height="300"></canvas>
+    <canvas id="canvasFunc" width="300" height="300"></canvas>
+</div>
 
 <script>
-    const PIN = "0000";
     let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
     let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
-
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleString('pt-BR');
-    }, 1000);
 
     function autenticar() {
         if(document.getElementById('pin-input').value === PIN) {
@@ -155,34 +134,35 @@
         } else { alert("ACESSO NEGADO"); }
     }
 
+    const PIN = "0000"; 
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
+
     function salvarProduto() {
         const id = document.getElementById('edit-id').value;
         const nome = document.getElementById('p-nome').value.toUpperCase();
         const tipo = document.getElementById('p-tipo').value;
         const min = parseInt(document.getElementById('p-min').value) || 0;
         const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
-        
-        if(!nome) return alert("Digite o nome!");
-        
+        if(!nome) return;
         if(id) {
             const idx = produtos.findIndex(p => p.id == id);
             produtos[idx] = { ...produtos[idx], nome, tipo, min };
-            cancelarEdicao();
         } else {
             produtos.push({ id: Date.now(), nome, tipo, min, qtd, emUso: 0 });
         }
         salvar();
+        cancelarEdicao();
     }
 
-    function buscarItemMovimento(valor) {
+    function buscarItemMovimento(v) {
         const lista = document.getElementById('lista-busca');
-        if (valor.length < 1) { lista.classList.add('hidden'); return; }
-        const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(valor.toLowerCase()));
+        if (v.length < 1) { lista.classList.add('hidden'); return; }
+        const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(v.toLowerCase()));
         lista.innerHTML = '';
         filtrados.forEach(p => {
             const div = document.createElement('div');
-            div.className = 'p-4 hover:bg-gray-100 cursor-pointer border-b flex justify-between items-center';
-            div.innerHTML = `<span class="font-bold">${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</span> <span class="text-xs bg-gray-200 px-2 py-1 rounded">Qtd: ${p.qtd}</span>`;
+            div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold';
+            div.innerHTML = `<span>${p.nome}</span><span class="text-[10px] bg-vinho text-white px-2 py-1 rounded">SALDO: ${p.qtd}</span>`;
             div.onclick = () => {
                 document.getElementById('m-id-selecionado').value = p.id;
                 document.getElementById('m-busca-item').value = p.nome;
@@ -198,31 +178,15 @@
         const op = document.getElementById('m-op').value;
         const qtd = parseInt(document.getElementById('m-qtd').value);
         const setor = document.getElementById('m-setor').value;
-        const resp = document.getElementById('m-nome').value;
-        
-        if(!id || !qtd || (op === 'saida' && !setor)) return alert("Preencha todos os campos!");
-        
+        const resp = document.getElementById('m-nome').value.toUpperCase();
+        if(!id || !qtd) return;
         const p = produtos.find(item => item.id == id);
-        const agora = new Date();
-
         if(op === 'saida') {
-            if(p.qtd < qtd) return alert("Saldo insuficiente!");
+            if(p.qtd < qtd) return alert("SEM SALDO!");
             p.qtd -= qtd;
             if(p.tipo === 'Ferramenta') p.emUso = (p.emUso || 0) + qtd;
-        } else {
-            p.qtd += qtd;
-        }
-
-        logs.push({ 
-            t: agora.getTime(), 
-            data: agora.toLocaleString(), 
-            tipo: op.toUpperCase(), 
-            prod: p.nome, 
-            qtd, 
-            setor: op === 'saida' ? setor : 'ALMOX', 
-            resp: resp || 'SISTEMA' 
-        });
-
+        } else { p.qtd += qtd; }
+        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: op.toUpperCase(), prod: p.nome, qtd, setor: op === 'saida' ? setor : 'ALMOX', resp: resp || 'SISTEMA' });
         salvar();
         document.getElementById('m-busca-item').value = '';
         document.getElementById('m-qtd').value = '';
@@ -231,81 +195,24 @@
     function render() {
         const busca = document.getElementById('busca-geral').value.toLowerCase();
         const corpo = document.getElementById('lista-corpo');
-        
-        // --- LÓGICA DE ORDENAÇÃO INTELIGENTE ---
-        // 1. Primeiro itens que precisam repor (qtd <= min)
-        // 2. Depois por ordem alfabética
-        produtos.sort((a, b) => {
-            const aRepor = a.qtd <= a.min;
-            const bRepor = b.qtd <= b.min;
-            if (aRepor && !bRepor) return -1;
-            if (!aRepor && bRepor) return 1;
-            return a.nome.localeCompare(b.nome);
-        });
-
+        produtos.sort((a, b) => (a.qtd <= a.min ? -1 : 1) || a.nome.localeCompare(b.nome));
         corpo.innerHTML = '';
-        let criticosCount = 0;
-
+        let criticos = 0;
         produtos.forEach(p => {
             if(p.nome.toLowerCase().includes(busca)) {
-                let statusCls = "bg-green-100 text-green-700", statusTxt = "ESTOQUE OK";
-                if(p.qtd <= p.min) { 
-                    statusCls = "status-vermelho"; 
-                    statusTxt = "REPOR AGORA"; 
-                    criticosCount++;
-                }
-                if(p.tipo === 'Ferramenta' && p.emUso > 0) { 
-                    statusTxt = `EM USO: ${p.emUso}`; 
-                    statusCls = "bg-amber-100 text-amber-700 font-bold"; 
-                }
-
+                let sCls = "bg-green-100 text-green-700", sTxt = "OK";
+                if(p.qtd <= p.min) { sCls = "status-vermelho"; sTxt = "REPOR"; criticos++; }
                 corpo.innerHTML += `
-                    <tr class="border-b hover:bg-gray-50 transition">
-                        <td class="p-4">
-                            <div class="font-bold text-gray-800">${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</div>
-                            <div class="text-[10px] text-gray-400">MÍNIMO: ${p.min}</div>
-                        </td>
-                        <td class="p-4 text-center font-black text-xl text-vinho">${p.qtd}</td>
-                        <td class="p-4 text-center"><span class="text-[10px] px-3 py-1 rounded-full ${statusCls}">${statusTxt}</span></td>
-                        <td class="p-4 text-right">
-                            <button onclick="editarItem(${p.id})" class="text-blue-500 hover:underline text-xs font-bold">EDITAR</button>
-                        </td>
+                    <tr class="border-b">
+                        <td class="p-4 font-bold text-gray-700 text-sm">${p.nome}</td>
+                        <td class="p-4 text-center font-black text-lg text-vinho">${p.qtd}</td>
+                        <td class="p-4 text-center"><span class="text-[9px] px-2 py-1 rounded ${sCls}">${sTxt}</span></td>
+                        <td class="p-4 text-right"><button onclick="editarItem(${p.id})" class="text-blue-500 font-bold text-[10px]">EDITAR</button></td>
                     </tr>`;
             }
         });
-
-        // Atualizar Dashboard
-        document.getElementById('dash-criticos').innerText = criticosCount;
-        document.getElementById('dash-saidas').innerText = logs.filter(l => new Date(l.t).toLocaleDateString() === new Date().toLocaleDateString()).length;
-        
-        // Log rápido (Últimas 5)
-        const logHtml = logs.slice(-5).reverse().map(l => `
-            <div class="border-l-2 border-vinho pl-2 py-1">
-                <span class="font-bold text-vinho">${l.tipo}:</span> ${l.prod} (${l.qtd})<br>
-                <span class="text-gray-400">${l.setor} | ${l.data.split(' ')[0]}</span>
-            </div>
-        `).join('');
-        document.getElementById('log-rapido').innerHTML = logHtml || 'Nenhum registro hoje.';
-    }
-
-    function editarItem(id) {
-        const p = produtos.find(p => p.id == id);
-        document.getElementById('edit-id').value = p.id;
-        document.getElementById('p-nome').value = p.nome;
-        document.getElementById('p-tipo').value = p.tipo;
-        document.getElementById('p-min').value = p.min;
-        document.getElementById('div-qtd-inicial').classList.add('hidden');
-        document.getElementById('form-title').innerText = "✏️ EDITAR PRODUTO";
-        document.getElementById('btn-cancelar').classList.remove('hidden');
-        window.scrollTo(0,0);
-    }
-
-    function cancelarEdicao() {
-        document.getElementById('edit-id').value = "";
-        document.getElementById('p-nome').value = "";
-        document.getElementById('div-qtd-inicial').classList.remove('hidden');
-        document.getElementById('form-title').innerText = "📝 CADASTRO DE ITEM";
-        document.getElementById('btn-cancelar').classList.add('hidden');
+        document.getElementById('dash-criticos').innerText = criticos;
+        document.getElementById('dash-saidas').innerText = logs.filter(l => l.t > Date.now() - (7*24*60*60*1000)).length;
     }
 
     function salvar() {
@@ -314,90 +221,114 @@
         render();
     }
 
-    function fazerBackup(h) {
-        const data = { prods: produtos, logs: logs };
-        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    function editarItem(id) {
+        const p = produtos.find(p => p.id == id);
+        document.getElementById('edit-id').value = p.id;
+        document.getElementById('p-nome').value = p.nome;
+        document.getElementById('p-min').value = p.min;
+        document.getElementById('div-qtd-inicial').classList.add('hidden');
+        document.getElementById('btn-cancelar').classList.remove('hidden');
+        window.scrollTo(0,0);
+    }
+
+    function cancelarEdicao() {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('p-nome').value = "";
+        document.getElementById('div-qtd-inicial').classList.remove('hidden');
+        document.getElementById('btn-cancelar').classList.add('hidden');
+    }
+
+    function fazerBackup() {
+        const d = { prods: produtos, logs: logs };
+        const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `SISTEMA_V8_BKP_${new Date().toLocaleDateString()}.json`;
+        a.download = `ALMOX_BKP_${new Date().toLocaleDateString()}.json`;
         a.click();
     }
 
     function importarBackup(e) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
+        const r = new FileReader();
+        r.onload = (ev) => {
             const d = JSON.parse(ev.target.result);
-            produtos = d.prods || d.produtos || [];
-            logs = d.logs || [];
-            salvar();
-            location.reload();
+            produtos = d.prods || []; logs = d.logs || [];
+            salvar(); location.reload();
         };
-        reader.readAsText(e.target.files[0]);
+        r.readAsText(e.target.files[0]);
     }
 
-    // --- FUNÇÃO DE RELATÓRIO COM GRÁFICOS ---
-    async function gerarRelatorioInteligente() {
+    // --- RELATÓRIO PDF V8.5 COM GRÁFICOS E SETORES ---
+    async function gerarRelatorioSetorGrafico() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const agora = new Date();
-        const seteDiasMs = 7 * 24 * 60 * 60 * 1000;
-        const limite = agora.getTime() - seteDiasMs;
-        const logsRecentes = logs.filter(l => l.tipo === 'SAÍDA' && (!l.t || l.t >= limite));
+        const agora = Date.now();
+        const limite = agora - (7 * 24 * 60 * 60 * 1000);
+        const lR = logs.filter(l => l.tipo === 'SAÍDA' && l.t >= limite);
 
-        if(logsRecentes.length === 0) return alert("Sem movimentações nos últimos 7 dias.");
+        if(lR.length === 0) return alert("Sem dados na semana.");
 
-        // Cálculos para Gráficos
-        const gastosSetor = {};
-        const gastosFunc = {};
-        logsRecentes.forEach(l => {
-            gastosSetor[l.setor] = (gastosSetor[l.setor] || 0) + l.qtd;
-            gastosFunc[l.resp] = (gastosFunc[l.resp] || 0) + l.qtd;
-        });
+        // Cabeçalho
+        doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255); doc.setFontSize(22); doc.text("BALANÇO ANALÍTICO SEMANAL", 15, 20);
+        doc.setFontSize(10); doc.text(`Produced by J Guilherme A.C. | ${new Date().toLocaleDateString()}`, 15, 30);
 
-        doc.setFontSize(22); doc.setTextColor(77, 0, 17);
-        doc.text("BALANÇO INTELIGENTE SEMANAL", 14, 20);
-        doc.setFontSize(10); doc.setTextColor(100);
-        doc.text(`Período: ${new Date(limite).toLocaleDateString()} a ${agora.toLocaleDateString()}`, 14, 28);
+        // --- GRÁFICOS (Gerando Imagens do Chart.js) ---
+        const dadosSetor = {}; lR.forEach(l => dadosSetor[l.setor] = (dadosSetor[l.setor] || 0) + l.qtd);
+        const chartSetorImg = await criarGraficoImg('canvasSetor', Object.keys(dadosSetor), Object.values(dadosSetor), 'Consumo por Setor (%)');
+        doc.addImage(chartSetorImg, 'PNG', 15, 50, 80, 60);
 
-        // Resumo de Texto
-        doc.setFontSize(12); doc.setTextColor(0);
-        doc.text("Resumo de Consumo:", 14, 45);
+        const dadosFunc = {}; lR.forEach(l => dadosFunc[l.resp] = (dadosFunc[l.resp] || 0) + l.qtd);
+        const topFunc = Object.entries(dadosFunc).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        const chartFuncImg = await criarGraficoImg('canvasFunc', topFunc.map(f=>f[0]), topFunc.map(f=>f[1]), 'Top Funcionários (%)');
+        doc.addImage(chartFuncImg, 'PNG', 110, 50, 80, 60);
+
+        // --- TABELAS POR SETOR ---
+        let y = 120;
+        const setores = [...new Set(lR.map(l => l.setor))];
         
-        // Tabela Principal
-        doc.autoTable({
-            startY: 50,
-            head: [['Data', 'Produto', 'Qtd', 'Setor', 'Responsável']],
-            body: logsRecentes.map(l => [l.data, l.prod, l.qtd, l.setor, l.resp]),
-            theme: 'grid',
-            headStyles: {fillColor: [77, 0, 17]},
-            styles: {fontSize: 7}
+        setores.forEach(s => {
+            if(y > 240) { doc.addPage(); y = 20; }
+            doc.setTextColor(77,0,17); doc.setFontSize(12); doc.text(`SETOR: ${s || 'N/A'}`, 15, y);
+            const body = lR.filter(l => l.setor === s).map(l => [l.data, l.prod, l.qtd, l.resp]);
+            doc.autoTable({
+                startY: y + 3,
+                head: [['Data', 'Produto', 'Qtd', 'Quem']],
+                body: body,
+                theme: 'grid',
+                headStyles: {fillColor:[77,0,17]},
+                styles: {fontSize: 8}
+            });
+            y = doc.lastAutoTable.finalY + 15;
         });
 
-        // Nova Página para Estatísticas
-        doc.addPage();
-        doc.setFontSize(16); doc.text("ESTATÍSTICAS DE CONSUMO", 14, 20);
-
-        // Aqui poderíamos desenhar os gráficos como tabelas de ranking (mais robusto que canvas em PDF no navegador)
-        const rankingSetor = Object.entries(gastosSetor).sort((a,b) => b[1] - a[1]);
-        doc.setFontSize(12); doc.text("RANKING DE CONSUMO POR SETOR", 14, 35);
-        doc.autoTable({
-            startY: 40,
-            head: [['Setor', 'Total de Itens Retirados']],
-            body: rankingSetor,
-            headStyles: {fillColor: [100, 100, 100]}
-        });
-
-        const rankingFunc = Object.entries(gastosFunc).sort((a,b) => b[1] - a[1]).slice(0, 5);
-        doc.text("TOP 5 FUNCIONÁRIOS (MAIOR CONSUMO)", 14, doc.lastAutoTable.finalY + 15);
-        doc.autoTable({
-            startY: doc.lastAutoTable.finalY + 20,
-            head: [['Funcionário', 'Total de Itens']],
-            body: rankingFunc,
-            headStyles: {fillColor: [50, 50, 50]}
-        });
-
-        doc.save(`Relatorio_Inteligente_V8.pdf`);
+        doc.save("Relatorio_Intelligence_V8.5.pdf");
     }
+
+    function criarGraficoImg(canvasId, labels, data, title) {
+        return new Promise((resolve) => {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#4d0011', '#800000', '#a4161a', '#ba181b', '#e5383b', '#b1a7a6']
+                    }]
+                },
+                options: {
+                    plugins: { title: { display: true, text: title }, legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 8} } } },
+                    animation: false
+                }
+            });
+            setTimeout(() => { resolve(chart.toBase64Image()); chart.destroy(); }, 500);
+        });
+    }
+
+    // Bloqueios de Segurança
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
+    };
 </script>
 </body>
 </html>
