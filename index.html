@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V8.6 - J. GUILHERME</title>
+    <title>ALMOXARIFADO INTELLIGENT V8.7 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -15,7 +15,7 @@
         .text-vinho { color: var(--vinho); }
         .status-vermelho { background: #e11d48; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .card-dash { background: white; padding: 20px; border-radius: 16px; border-bottom: 4px solid var(--vinho); shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .card-dash { background: white; padding: 20px; border-radius: 16px; border-bottom: 4px solid var(--vinho); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
         .hidden { display: none; }
@@ -26,7 +26,7 @@
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
     <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V8.6</h2>
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V8.7</h2>
         <p class="text-gray-400 text-xs mb-8 font-bold">Produced by J Guilherme A.C.</p>
         <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
         <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
@@ -34,7 +34,7 @@
 </div>
 
 <div id="app" class="hidden p-4 max-w-7xl mx-auto pb-16">
-    <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:row justify-between items-center shadow-2xl gap-6">
+    <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
         <div class="text-center lg:text-left">
             <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
             <p id="clock" class="text-sm font-mono opacity-60"></p>
@@ -57,7 +57,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Itens Críticos</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase">Reposição Urgente</p>
             <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
         </div>
         <div class="card-dash">
@@ -65,11 +65,11 @@
             <h2 id="dash-saidas" class="text-3xl font-black text-blue-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Total em Estoque</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase">Total em Peças</p>
             <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Itens em Uso</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase">Ferramentas em Uso</p>
             <h2 id="dash-uso" class="text-3xl font-black text-amber-500">0</h2>
         </div>
     </div>
@@ -82,8 +82,8 @@
                 <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-vinho/10 uppercase font-bold">
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
-                        <option value="Insumo">Insumo</option>
-                        <option value="Ferramenta">Ferramenta</option>
+                        <option value="Insumo">Insumo (📦)</option>
+                        <option value="Ferramenta">Ferramenta (🛠️)</option>
                     </select>
                     <input type="number" id="p-min" placeholder="Min" class="border p-3 rounded-xl text-center font-bold">
                 </div>
@@ -97,19 +97,18 @@
             </div>
 
             <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Últimas Movimentações</h3>
-                <div id="historico-lista" class="space-y-3 mb-6">
-                    </div>
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Atividades Recentes</h3>
+                <div id="historico-lista" class="space-y-3 mb-6"></div>
 
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic border-t pt-4">Registrar Saída/Entrada</h3>
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic border-t pt-4">Movimentar</h3>
                 <div class="relative">
-                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3 focus:border-vinho">
+                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3 focus:border-vinho">
                     <div id="lista-busca" class="search-results hidden"></div>
                 </div>
                 <input type="hidden" id="m-id-selecionado">
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <select id="m-op" class="border p-3 rounded-xl font-black bg-gray-50 text-vinho uppercase text-xs">
-                        <option value="saida">Retirada (-)</option>
+                        <option value="saida">Saída (-)</option>
                         <option value="entrada">Entrada (+)</option>
                     </select>
                     <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl text-vinho">
@@ -117,8 +116,9 @@
                 <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
                 <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold">
                     <option value="">-- SELECIONE O SETOR --</option>
-                    <option>Setor 1</option><option>Setor 2</option><option>Limpeza de Estofados</option><option>Futtons</option>
-                    <option>Pintura</option><option>Marcenaria</option><option>Reparo</option><option>Forração</option>
+                    <option>MONTAGEM</option><option>Setor 1</option><option>Setor 2</option>
+                    <option>Limpeza de Estofados</option><option>Futtons</option><option>Pintura</option>
+                    <option>Marcenaria</option><option>Reparo</option><option>Forração</option>
                     <option>Solda</option><option>Escritório</option>
                 </select>
                 <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Registro</button>
@@ -127,7 +127,7 @@
 
         <div class="lg:col-span-8 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-6 bg-gray-50/50 border-b">
-                <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 PESQUISAR EM TODO O ALMOXARIFADO..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100">
+                <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 PESQUISAR EM TODO O ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100">
             </div>
             <div class="overflow-x-auto px-4 pb-4">
                 <table class="w-full text-left">
@@ -158,7 +158,6 @@
     let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
     let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
 
-    // Inicializar datas do filtro com a última semana
     window.onload = () => {
         const hoje = new Date();
         const semanaPassada = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
@@ -200,8 +199,9 @@
         lista.innerHTML = '';
         filtrados.forEach(p => {
             const div = document.createElement('div');
+            const ico = p.tipo === 'Ferramenta' ? '🛠️' : '📦';
             div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold';
-            div.innerHTML = `<span>${p.nome}</span><span class="text-[10px] bg-vinho text-white px-2 py-1 rounded">QTD: ${p.qtd}</span>`;
+            div.innerHTML = `<span>${ico} ${p.nome}</span><span class="text-[10px] bg-vinho text-white px-2 py-1 rounded">QTD: ${p.qtd}</span>`;
             div.onclick = () => {
                 document.getElementById('m-id-selecionado').value = p.id;
                 document.getElementById('m-busca-item').value = p.nome;
@@ -225,7 +225,7 @@
             p.qtd -= qtd;
             if(p.tipo === 'Ferramenta') p.emUso = (p.emUso || 0) + qtd;
         } else { p.qtd += qtd; }
-        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: op.toUpperCase(), prod: p.nome, qtd, setor: op === 'saida' ? setor : 'ALMOX', resp: resp || 'SISTEMA' });
+        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: op.toUpperCase(), prod: p.nome, prodTipo: p.tipo, qtd, setor: op === 'saida' ? setor : 'ALMOX', resp: resp || 'SISTEMA' });
         salvar();
         document.getElementById('m-busca-item').value = '';
         document.getElementById('m-qtd').value = '';
@@ -235,10 +235,7 @@
         const busca = document.getElementById('busca-geral').value.toLowerCase();
         const corpo = document.getElementById('lista-corpo');
         const histDiv = document.getElementById('historico-lista');
-        
-        // Ordenação inteligente: Críticos no Topo
         produtos.sort((a, b) => (a.qtd <= a.min ? -1 : 1) || a.nome.localeCompare(b.nome));
-        
         corpo.innerHTML = '';
         let criticos = 0, totalP = 0, emUso = 0;
 
@@ -248,9 +245,13 @@
             if(p.nome.toLowerCase().includes(busca)) {
                 let sCls = "bg-green-100 text-green-700", sTxt = "ESTOQUE OK";
                 if(p.qtd <= p.min) { sCls = "status-vermelho"; sTxt = "REPOR"; criticos++; }
+                const ico = p.tipo === 'Ferramenta' ? '🛠️' : '📦';
                 corpo.innerHTML += `
                     <tr class="border-b border-gray-50">
-                        <td class="p-4 font-black text-gray-700 text-sm">${p.nome} <br><span class="text-[9px] text-gray-300 font-normal">MIN: ${p.min}</span></td>
+                        <td class="p-4 font-black text-gray-700 text-sm">
+                            <span class="mr-2">${ico}</span>${p.nome} 
+                            <br><span class="text-[9px] text-gray-300 font-normal">MIN: ${p.min}</span>
+                        </td>
                         <td class="p-4 text-center font-black text-xl text-vinho">${p.qtd}</td>
                         <td class="p-4 text-center"><span class="text-[9px] px-3 py-1 rounded-lg font-bold ${sCls}">${sTxt}</span></td>
                         <td class="p-4 text-right"><button onclick="editarItem(${p.id})" class="text-blue-500 font-black text-[10px] hover:underline">EDITAR</button></td>
@@ -258,20 +259,20 @@
             }
         });
 
-        // Dashboard
         document.getElementById('dash-criticos').innerText = criticos;
         document.getElementById('dash-saidas').innerText = logs.filter(l => l.t > Date.now() - (7*24*60*60*1000)).length;
         document.getElementById('dash-total').innerText = totalP;
         document.getElementById('dash-uso').innerText = emUso;
 
-        // Histórico na tela (Últimas 5)
         const ultimos = logs.slice(-5).reverse();
-        histDiv.innerHTML = ultimos.map(l => `
+        histDiv.innerHTML = ultimos.map(l => {
+            const ico = l.prodTipo === 'Ferramenta' ? '🛠️' : '📦';
+            return `
             <div class="flex items-center justify-between text-[10px] bg-gray-50 p-2 rounded-lg border-l-4 ${l.tipo === 'SAIDA' ? 'border-red-500' : 'border-green-500'}">
-                <div><span class="font-bold uppercase">${l.tipo}</span>: ${l.prod} (${l.qtd})</div>
-                <div class="text-gray-400 font-mono italic">${l.data.split(', ')[1]}</div>
-            </div>
-        `).join('') || '<p class="text-[10px] text-gray-400">Sem atividades recentes.</p>';
+                <div>${ico} <span class="font-bold uppercase">${l.tipo}</span>: ${l.prod} (${l.qtd})</div>
+                <div class="text-gray-400 font-mono italic text-[9px]">${l.data.split(', ')[1]}</div>
+            </div>`;
+        }).join('') || '<p class="text-[10px] text-gray-400">Sem atividades recentes.</p>';
     }
 
     function editarItem(id) {
@@ -279,6 +280,7 @@
         document.getElementById('edit-id').value = p.id;
         document.getElementById('p-nome').value = p.nome;
         document.getElementById('p-min').value = p.min;
+        document.getElementById('p-tipo').value = p.tipo;
         document.getElementById('div-qtd-inicial').classList.add('hidden');
         document.getElementById('form-title').innerText = "✏️ EDITAR MATERIAL";
         document.getElementById('btn-cancelar').classList.remove('hidden');
@@ -321,23 +323,18 @@
     async function gerarRelatorioSetorGrafico() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // Datas do Filtro
         const dataInicio = new Date(document.getElementById('filtro-inicio').value + "T00:00:00").getTime();
         const dataFim = new Date(document.getElementById('filtro-fim').value + "T23:59:59").getTime();
-        
         const lR = logs.filter(l => l.tipo === 'SAIDA' && l.t >= dataInicio && l.t <= dataFim);
 
         if(lR.length === 0) return alert("Sem dados no período selecionado.");
 
-        // Capa/Topo
         doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 45, 'F');
         doc.setTextColor(255); doc.setFontSize(22); doc.text("BALANÇO ANALÍTICO DE ALMOXARIFADO", 15, 20);
         doc.setFontSize(10); 
         doc.text(`Período: ${new Date(dataInicio).toLocaleDateString()} até ${new Date(dataFim).toLocaleDateString()}`, 15, 30);
         doc.text(`Produced by J Guilherme A.C.`, 15, 38);
 
-        // --- GRÁFICOS ---
         const dadosSetor = {}; lR.forEach(l => dadosSetor[l.setor] = (dadosSetor[l.setor] || 0) + l.qtd);
         const chartSetorImg = await criarGraficoImg('canvasSetor', Object.keys(dadosSetor), Object.values(dadosSetor), 'Consumo por Setor (%)');
         doc.addImage(chartSetorImg, 'PNG', 15, 55, 85, 65);
@@ -347,7 +344,6 @@
         const chartFuncImg = await criarGraficoImg('canvasFunc', topFunc.map(f=>f[0]), topFunc.map(f=>f[1]), 'Top 5 Responsáveis (%)');
         doc.addImage(chartFuncImg, 'PNG', 110, 55, 85, 65);
 
-        // --- TABELAS ORGANIZADAS POR SETOR ---
         let y = 130;
         const setores = [...new Set(lR.map(l => l.setor))];
         setores.forEach(s => {
@@ -365,8 +361,7 @@
             });
             y = doc.lastAutoTable.finalY + 15;
         });
-
-        doc.save(`Relatorio_Almox_${new Date(dataInicio).toLocaleDateString()}_a_${new Date(dataFim).toLocaleDateString()}.pdf`);
+        doc.save(`Relatorio_Almox_${new Date(dataInicio).toLocaleDateString()}.pdf`);
     }
 
     function criarGraficoImg(canvasId, labels, data, title) {
@@ -378,7 +373,7 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: ['#4d0011', '#800000', '#a4161a', '#ba181b', '#e5383b', '#660708', '#343a40']
+                        backgroundColor: ['#4d0011', '#a4161a', '#e5383b', '#660708', '#343a40', '#800000']
                     }]
                 },
                 options: {
@@ -390,7 +385,6 @@
         });
     }
 
-    // Travas de Segurança
     document.onkeydown = function(e) {
         if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
     };
