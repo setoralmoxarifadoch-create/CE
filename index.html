@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V9.2 - J. GUILHERME</title>
+    <title>ALMOXARIFADO INTELLIGENT V10 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -20,13 +20,14 @@
         .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
         .hidden { display: none; }
         .pendencia-card { border-left: 4px solid #e11d48; background: #fff1f2; }
+        #logo-preview { max-height: 50px; max-width: 150px; object-fit: contain; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
     <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.2</h2>
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V10</h2>
         <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
         <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
         <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
@@ -35,17 +36,23 @@
 
 <div id="app" class="hidden p-4 max-w-7xl mx-auto pb-16">
     <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
-        <div class="text-center lg:text-left">
-            <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
-            <p id="clock" class="text-sm font-mono opacity-60"></p>
+        <div class="flex items-center gap-4">
+            <div id="container-logo" class="bg-white/10 p-2 rounded-xl border border-white/20 cursor-pointer" onclick="document.getElementById('input-logo').click()">
+                <img id="logo-img" src="" alt="LOGO" class="hidden">
+                <div id="logo-placeholder" class="text-[10px] font-bold opacity-50">CLIQUE<br>PARA LOGO</div>
+                <input type="file" id="input-logo" class="hidden" accept="image/*" onchange="uploadLogo(event)">
+            </div>
+            <div>
+                <h1 class="text-2xl font-black tracking-tighter uppercase italic leading-none">Almoxarifado Intelligence</h1>
+                <p id="clock" class="text-sm font-mono opacity-60"></p>
+            </div>
         </div>
         
         <div class="flex flex-wrap items-center bg-white/10 p-3 rounded-2xl gap-3">
             <div class="text-[10px] font-bold uppercase">Relatórios:</div>
             <input type="date" id="filtro-inicio" class="text-black text-xs p-1 rounded">
             <input type="date" id="filtro-fim" class="text-black text-xs p-1 rounded">
-            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço</button>
-            <button onclick="gerarRelatorioAluguel()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">🤝 Aluguéis</button>
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço + Gráfico</button>
         </div>
 
         <div class="flex gap-2">
@@ -128,7 +135,7 @@
                 <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold uppercase"></select>
                 <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Agora</button>
             </div>
-
+            
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-200">
                 <h3 class="font-black text-amber-600 mb-4 text-xs uppercase italic border-b pb-2">🤝 Gestão de Aluguéis</h3>
                 <div class="space-y-2 mb-4">
@@ -172,11 +179,11 @@
     </div>
 </div>
 
-<div class="signature italic">Produced by J Guilherme A.C. | V9.2</div>
-
-<div style="position: absolute; left: -9999px;">
-    <canvas id="canvasSetor" width="300" height="300"></canvas>
+<div style="position: absolute; left: -9999px; top: -9999px;">
+    <canvas id="canvasGrafico" width="400" height="400"></canvas>
 </div>
+
+<div class="signature italic">Produced by J Guilherme A.C. | V10.0</div>
 
 <script>
     const PIN = "0000"; 
@@ -191,8 +198,48 @@
         const semanaPassada = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
         document.getElementById('filtro-fim').value = hoje.toISOString().split('T')[0];
         document.getElementById('filtro-inicio').value = semanaPassada.toISOString().split('T')[0];
+        
+        limparLogsAntigos(); // Função automática de limpeza
+        carregarLogo();      // Carrega logo salva
         atualizarSelectSetores();
     };
+
+    // --- FUNÇÃO: LIMPAR LOGS ANTIGOS (30 dias) ---
+    function limparLogsAntigos() {
+        const trintaDiasEmMs = 30 * 24 * 60 * 60 * 1000;
+        const limite = Date.now() - trintaDiasEmMs;
+        const totalAntes = logs.length;
+        
+        logs = logs.filter(l => l.t > limite);
+        
+        if(logs.length < totalAntes) {
+            console.log(`Limpeza: ${totalAntes - logs.length} logs antigos removidos.`);
+            salvar();
+        }
+    }
+
+    // --- FUNÇÃO: LOGOTIPO ---
+    function uploadLogo(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const base64 = e.target.result;
+            localStorage.setItem('almox_logo_empresa', base64);
+            carregarLogo();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function carregarLogo() {
+        const logoBase64 = localStorage.getItem('almox_logo_empresa');
+        const img = document.getElementById('logo-img');
+        const placeholder = document.getElementById('logo-placeholder');
+        if(logoBase64) {
+            img.src = logoBase64;
+            img.className = "max-h-12 w-auto block rounded-lg shadow-sm";
+            placeholder.className = "hidden";
+        }
+    }
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
 
@@ -397,7 +444,7 @@
         const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `BKP_V92.json`; a.click();
+        a.download = `BKP_V10.json`; a.click();
     }
 
     function importarBackup(e) {
@@ -410,45 +457,79 @@
         r.readAsText(e.target.files[0]);
     }
 
-    // --- PDF AGRUPADO POR SETOR ---
+    // --- PDF COM GRÁFICOS DE PIZZA ---
     async function gerarRelatorioSetorGrafico() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const dIni = new Date(document.getElementById('filtro-inicio').value + "T00:00:00").getTime();
         const dFim = new Date(document.getElementById('filtro-fim').value + "T23:59:59").getTime();
-        const logsPeriodo = logs.filter(l => l.t >= dIni && l.t <= dFim);
+        const logsPeriodo = logs.filter(l => l.t >= dIni && l.t <= dFim && l.tipo === 'SAIDA');
         
-        if(logsPeriodo.length === 0) return alert("Sem dados no período!");
+        if(logsPeriodo.length === 0) return alert("Sem saídas registradas no período para gerar gráfico!");
 
-        doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 45, 'F');
-        doc.setTextColor(255); doc.setFontSize(22); doc.text("BALANÇO ANALÍTICO POR SETOR", 15, 25);
-        doc.setFontSize(10); doc.text(`Gerado em: ${new Date().toLocaleString()}`, 15, 35);
-
-        let yPos = 55;
-        // Agrupar logs por Setor
-        const setoresUnicos = [...new Set(logsPeriodo.map(l => l.setor))];
-
-        setoresUnicos.forEach(setor => {
-            if (yPos > 250) { doc.addPage(); yPos = 20; }
-            
-            doc.setTextColor(77, 0, 17);
-            doc.setFontSize(14);
-            doc.text(`SETOR: ${setor}`, 15, yPos);
-            yPos += 5;
-
-            const logsSetor = logsPeriodo.filter(l => l.setor === setor);
-            doc.autoTable({
-                startY: yPos,
-                head: [['Data', 'Tipo', 'Produto', 'Qtd', 'Responsável']],
-                body: logsSetor.map(l => [l.data.split(',')[0], l.tipo, l.prod, l.qtd, l.resp]),
-                theme: 'grid',
-                headStyles: { fillColor: [77, 0, 17] },
-                styles: { fontSize: 8 }
-            });
-            yPos = doc.lastAutoTable.finalY + 15;
+        // 1. Processar dados para o gráfico (Total por Setor)
+        const consumoPorSetor = {};
+        logsPeriodo.forEach(l => {
+            consumoPorSetor[l.setor] = (consumoPorSetor[l.setor] || 0) + l.qtd;
         });
 
-        doc.save(`Balanço_Setores_V92.pdf`);
+        const labels = Object.keys(consumoPorSetor);
+        const values = Object.values(consumoPorSetor);
+
+        // 2. Renderizar Gráfico no Canvas oculto
+        const ctx = document.getElementById('canvasGrafico').getContext('2d');
+        if(window.meuGrafico) window.meuGrafico.destroy();
+        window.meuGrafico = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#4d0011', '#e11d48', '#fbbf24', '#3b82f6', '#10b981', '#6366f1']
+                }]
+            },
+            options: { 
+                animation: false,
+                plugins: { legend: { labels: { font: { size: 16, weight: 'bold' } } } }
+            }
+        });
+
+        // Aguardar renderização
+        await new Promise(r => setTimeout(r, 500));
+        const chartImg = document.getElementById('canvasGrafico').toDataURL('image/png');
+
+        // 3. Montar PDF
+        doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 45, 'F');
+        
+        // Adicionar logo no PDF se existir
+        const logoBase64 = localStorage.getItem('almox_logo_empresa');
+        if(logoBase64) {
+            doc.addImage(logoBase64, 'PNG', 160, 5, 35, 35);
+        }
+
+        doc.setTextColor(255); doc.setFontSize(20); doc.text("BALANÇO DE CONSUMO", 15, 25);
+        doc.setFontSize(10); doc.text(`Período: ${document.getElementById('filtro-inicio').value} até ${document.getElementById('filtro-fim').value}`, 15, 35);
+
+        // Adicionar o Gráfico
+        doc.setTextColor(77, 0, 17);
+        doc.setFontSize(14);
+        doc.text("DISTRIBUIÇÃO POR SETOR (%)", 105, 60, { align: "center" });
+        doc.addImage(chartImg, 'PNG', 55, 65, 100, 100);
+
+        // Tabela de Dados
+        doc.autoTable({
+            startY: 175,
+            head: [['Setor', 'Total Consumido', 'Representação (%)']],
+            body: labels.map((l, i) => {
+                const totalGeral = values.reduce((a, b) => a + b, 0);
+                const perc = ((values[i] / totalGeral) * 100).toFixed(1);
+                return [l, values[i], perc + '%'];
+            }),
+            theme: 'striped',
+            headStyles: { fillColor: [77, 0, 17] }
+        });
+
+        doc.save(`Relatorio_Consumo_Grafico.pdf`);
     }
 
     async function gerarRelatorioAluguel() {
