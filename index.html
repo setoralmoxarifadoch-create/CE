@@ -3,309 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA CHIAVARI - MASTER V12</title>
+    <title>ALMOXARIFADO INTELLIGENT V9.5 - J. GUILHERME</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { 
-            --vinho-chiavari: #4d0011; 
-            --dourado-chiavari: #a67c52;
-            --bege-fundo: #f4f1ea;
-        }
-        body { background-color: var(--bege-fundo); font-family: 'Inter', sans-serif; color: #333; }
-        
-        /* HEADER ESTILO MULTINACIONAL */
-        .header-premium {
-            background: linear-gradient(135deg, var(--vinho-chiavari) 0%, #2a0009 100%);
-            border-bottom: 4px solid var(--dourado-chiavari);
-        }
 
-        .piscante-alerta { 
-            color: #fff; background: #e11d48; font-weight: 900; 
-            animation: blink 0.8s infinite; padding: 8px; border-radius: 6px; 
-            margin-top: 5px; display: flex; justify-content: space-between; align-items: center; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        
-        .card-chiavari { background: white; border-radius: 12px; border: 1px solid #e2d9c8; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .btn-vinho { background-color: var(--vinho-chiavari); color: white; transition: all 0.3s; }
-        .btn-vinho:hover { background-color: #6a0018; transform: translateY(-1px); }
-        #canvasSuporte { display: none; }
-        
-        /* Inputs Profissionais */
-        input, select { border: 1px solid #d1c7b7 !important; border-radius: 8px !important; }
-        input:focus { border-color: var(--dourado-chiavari) !important; ring: 2px var(--dourado-chiavari); }
+    <style>
+        :root { --vinho: #4d0011; --vinho-claro: #851e36; }
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-user-select: none; user-select: none; }
+        .bg-vinho { background-color: var(--vinho); }
+        .text-vinho { color: var(--vinho); }
+        .status-vermelho { background: #e11d48; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .card-dash { background: white; padding: 20px; border-radius: 16px; border-bottom: 4px solid var(--vinho); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
+        .hidden { display: none; }
+        .pendencia-card { border-left: 4px solid #e11d48; background: #fff1f2; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body oncontextmenu="return false;">
 
-    <canvas id="canvasSuporte"></canvas>
+<div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
+    <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.5</h2>
+        <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
+        <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
+        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
+    </div>
+</div>
 
-    <header class="header-premium text-white p-6 rounded-2xl mb-8 flex flex-col md:flex-row justify-between items-center shadow-2xl">
-        <div class="flex items-center gap-6">
-            <div class="bg-white p-2 rounded-lg shadow-inner">
-                <img src="URL_DA_SUA_LOGOMARCA_AQUI" alt="CHIAVARI LOGO" class="h-16 w-auto object-contain">
+<div id="app" class="hidden p-4 max-w-7xl mx-auto pb-16">
+    
+    <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
+        <div class="flex items-center gap-4 text-center lg:text-left w-full lg:w-auto justify-center lg:justify-start">
+            <div class="relative group" title="Clique para alterar a logo">
+                <img id="img-logo" src="https://via.placeholder.com/150?text=LOGO" 
+                     class="w-16 h-16 object-contain bg-white rounded-xl cursor-pointer hover:opacity-80 transition shadow-lg border-2 border-white/20"
+                     onclick="document.getElementById('input-logo').click()">
+                <input type="file" id="input-logo" class="hidden" accept="image/*" onchange="salvarLogo(event)">
             </div>
+            
             <div>
-                <h1 class="text-3xl font-black tracking-tighter uppercase italic text-[#e5d5bc]">Master V12</h1>
-                <p class="text-xs tracking-[0.2em] opacity-80 font-light">GESTÃO DE ALMOXARIFADO PREMIUM</p>
+                <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
+                <p id="clock" class="text-sm font-mono opacity-60"></p>
             </div>
         </div>
-        <div class="flex gap-3 mt-4 md:mt-0">
-            <button onclick="gerarRelatorioPDF()" class="bg-[#a67c52] hover:bg-[#8e6a45] text-white px-5 py-2 rounded-full font-bold text-xs shadow-lg uppercase transition">📊 Relatório Inteligente</button>
-            <div id="clock" class="hidden md:block text-right font-mono text-sm opacity-60"></div>
+        
+        <div class="flex flex-wrap items-center justify-center bg-white/10 p-3 rounded-2xl gap-3">
+            <div class="text-[10px] font-bold uppercase">Relatórios:</div>
+            <input type="date" id="filtro-inicio" class="text-black text-xs p-1 rounded font-bold cursor-pointer">
+            <input type="date" id="filtro-fim" class="text-black text-xs p-1 rounded font-bold cursor-pointer">
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg hover:scale-105 transition">📊 Gráficos PDF</button>
+            <button onclick="gerarRelatorioAluguel()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg hover:scale-105 transition">🤝 Aluguéis PDF</button>
+        </div>
+
+        <div class="flex gap-2">
+            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase hover:bg-blue-700">💾 BKP</button>
+            <button onclick="document.getElementById('import-f').click()" class="bg-gray-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase italic hover:bg-gray-600">Restaurar</button>
+            <input type="file" id="import-f" onchange="importarBackup(event)" class="hidden">
         </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <div class="lg:col-span-4 space-y-6">
-            
-            <div class="card-chiavari p-5">
-                <h3 class="font-black text-gray-400 mb-4 text-[10px] uppercase tracking-widest border-b pb-2">⚙️ Gestão de Setores</h3>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="novo-setor" placeholder="Novo Setor" class="flex-1 p-2 text-xs uppercase font-bold outline-none">
-                    <button onclick="adicionarSetor()" class="bg-gray-800 text-white px-4 rounded-lg font-bold hover:bg-black transition">+</button>
-                </div>
-                <div id="lista-setores-config" class="flex flex-wrap gap-2"></div>
-            </div>
+    <div id="painel-pendencias" class="mb-8 hidden">
+        <h3 class="font-black text-red-600 mb-3 text-xs uppercase italic flex items-center gap-2">⚠️ Ferramentas em Uso (Pendentes de Devolução)</h3>
+        <div id="lista-pendencias" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    </div>
 
-            <div class="card-chiavari p-5 border-l-8 border-[#a67c52]">
-                <h3 class="font-black text-vinho-chiavari mb-4 text-xs uppercase italic tracking-wider">📝 Cadastro de Patrimônio</h3>
-                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full p-3 mb-3 uppercase font-bold text-xs">
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <select id="p-tipo" class="p-3 text-xs font-bold uppercase">
-                        <option value="Insumo">Insumo</option>
-                        <option value="Ferramenta">Ferramenta</option>
-                    </select>
-                    <input type="number" id="p-min" placeholder="Estoque Mín" class="p-3 text-center text-xs font-bold">
-                </div>
-                <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full p-4 text-center font-black text-2xl mb-4 bg-gray-50 rounded-xl">
-                <button onclick="salvarProduto()" class="w-full btn-vinho p-3 rounded-xl font-black uppercase text-xs shadow-md">Salvar no Sistema</button>
-            </div>
-
-            <div class="card-chiavari p-5 bg-[#fffdfa]">
-                <h3 class="font-black text-[#8e6a45] mb-4 text-xs uppercase italic tracking-wider">🤝 Controle de Alugados</h3>
-                <input type="text" id="alu-item" placeholder="EQUIPAMENTO" class="w-full p-2 mb-2 text-xs uppercase font-bold">
-                <input type="text" id="alu-empresa" placeholder="FORNECEDOR" class="w-full p-2 mb-2 text-xs uppercase font-bold">
-                <input type="date" id="alu-data" class="w-full p-2 text-xs mb-3">
-                <button onclick="registrarAluguel()" class="w-full bg-[#a67c52] text-white p-2 rounded-lg font-black uppercase text-xs">Registrar Aluguel</button>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Reposição Urgente</p>
+            <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
         </div>
-
-        <div class="lg:col-span-8 space-y-6">
-            
-            <div class="bg-white p-6 rounded-2xl shadow-2xl border-t-8 border-vinho-chiavari">
-                <h3 class="font-black text-vinho-chiavari mb-5 text-sm uppercase flex items-center gap-2">
-                    <span class="bg-vinho-chiavari text-white p-1 rounded">⚡</span> MOVIMENTAÇÃO DE SAÍDA
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase">Material</label>
-                        <select id="m-id" class="w-full p-3 text-sm font-bold uppercase bg-gray-50"></select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase">Setor Destino</label>
-                        <select id="m-setor" class="w-full p-3 text-sm font-bold uppercase bg-gray-50"></select>
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase">Quantidade</label>
-                        <input type="number" id="m-qtd" placeholder="0" class="w-full p-3 font-black text-center text-2xl bg-gray-50">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black text-gray-400 uppercase">Responsável</label>
-                        <input type="text" id="m-func" placeholder="NOME DO FUNCIONÁRIO" class="w-full p-3 uppercase text-sm font-bold bg-gray-50">
-                    </div>
-                </div>
-                <button onclick="registrarSaida()" class="w-full mt-6 btn-vinho p-4 rounded-xl font-black uppercase text-base shadow-xl">Confirmar Saída</button>
-            </div>
-
-            <div class="card-chiavari overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b">
-                        <tr><th class="p-4">Descrição do Item / Alertas de Posse</th><th class="p-4 text-center">Saldo Real</th><th class="p-4 text-right">Ações</th></tr>
-                    </thead>
-                    <tbody id="lista-estoque"></tbody>
-                </table>
-            </div>
-
-            <div class="card-chiavari overflow-hidden border-t-4 border-[#a67c52]">
-                <div class="p-3 bg-[#fcf9f5] font-black text-[11px] text-[#8e6a45] uppercase tracking-tighter italic">Equipamentos de Terceiros</div>
-                <table class="w-full text-left text-[10px]">
-                    <tbody id="lista-alugados"></tbody>
-                </table>
-            </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Movimentos (7d)</p>
+            <h2 id="dash-saidas" class="text-3xl font-black text-blue-600">0</h2>
+        </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Total em Peças</p>
+            <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
+        </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Aluguéis Ativos</p>
+            <h2 id="dash-aluguel" class="text-3xl font-black text-amber-500">0</h2>
         </div>
     </div>
 
-    <script>
-        // --- GAVETAS LIMPAS V12 ---
-        let produtos = JSON.parse(localStorage.getItem('ch_v12_p')) || [];
-        let posse = JSON.parse(localStorage.getItem('ch_v12_po')) || [];
-        let setores = JSON.parse(localStorage.getItem('ch_v12_s')) || ["MONTAGEM", "EVENTOS", "MANUTENÇÃO"];
-        let alugueis = JSON.parse(localStorage.getItem('ch_v12_a')) || [];
-        let historicoSaidas = JSON.parse(localStorage.getItem('ch_v12_h')) || [];
-
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
-
-        function adicionarSetor() {
-            const nome = document.getElementById('novo-setor').value.toUpperCase();
-            if(nome && !setores.includes(nome)) { setores.push(nome); salvar(); document.getElementById('novo-setor').value = ''; }
-        }
-        function removerSetor(nome) { setores = setores.filter(s => s !== nome); salvar(); }
-
-        function registrarAluguel() {
-            const item = document.getElementById('alu-item').value.toUpperCase();
-            const empresa = document.getElementById('alu-empresa').value.toUpperCase();
-            const data = document.getElementById('alu-data').value;
-            if(!item || !empresa) return;
-            alugueis.unshift({ id: Date.now(), item, empresa, data, status: 'ATIVO' });
-            salvar();
-        }
-
-        function devolverAluguel(id) {
-            const alu = alugueis.find(a => a.id === id);
-            alu.status = 'DEVOLVIDO'; alu.dataDev = new Date().toLocaleDateString();
-            salvar();
-        }
-
-        function ajustarSaldo(id) {
-            const novoSaldo = prompt("AJUSTE DE INVENTÁRIO - Digite o saldo exato:");
-            if (novoSaldo !== null && !isNaN(novoSaldo)) {
-                const p = produtos.find(item => item.id === id);
-                p.qtd = parseInt(novoSaldo);
-                salvar();
-            }
-        }
-
-        function salvarProduto() {
-            const nome = document.getElementById('p-nome').value.toUpperCase();
-            const tipo = document.getElementById('p-tipo').value;
-            const min = parseInt(document.getElementById('p-min').value) || 0;
-            const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
-            if(!nome) return;
-            produtos.push({ id: Date.now(), nome, tipo, min, qtd });
-            salvar();
-            document.getElementById('p-nome').value = ''; document.getElementById('p-qtd').value = '';
-        }
-
-        function registrarSaida() {
-            const id = document.getElementById('m-id').value;
-            const qtd = parseInt(document.getElementById('m-qtd').value);
-            const func = document.getElementById('m-func').value.toUpperCase();
-            const setor = document.getElementById('m-setor').value;
-            if(!id || !qtd || !func) return alert("Erro: Preencha todos os campos.");
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-4 space-y-6">
             
-            const p = produtos.find(item => item.id == id);
-            if(p.qtd < qtd) return alert("SALDO INSUFICIENTE NO SISTEMA.");
-            
-            p.qtd -= qtd;
-            historicoSaidas.push({ data: new Date(), item: p.nome, qtd, func, setor });
-            if(p.tipo === 'Ferramenta') posse.push({ idPosse: Date.now(), idProd: p.id, nome: p.nome, func: func, qtd: qtd });
-            
-            salvar();
-            document.getElementById('m-func').value = ''; document.getElementById('m-qtd').value = '';
-        }
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 id="form-title" class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Gestão de Produto</h3>
+                <input type="hidden" id="edit-id">
+                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-vinho/10 uppercase font-bold text-sm">
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
+                        <option value="Insumo">Insumo (📦)</option>
+                        <option value="Ferramenta">Ferramenta (🛠️)</option>
+                    </select>
+                    <input type="number" id="p-min" placeholder="Min" class="border p-3 rounded-xl text-center font-bold">
+                </div>
+                <div id="div-qtd-inicial" class="mb-3">
+                    <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-xl">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho text-white p-4 rounded-2xl font-black uppercase text-xs hover:bg-opacity-90">Salvar</button>
+                    <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-200 text-gray-600 px-6 rounded-2xl font-black hover:bg-gray-300">X</button>
+                </div>
+            </div>
 
-        function devolverFerramenta(idPosse) {
-            const item = posse.find(p => p.idPosse === idPosse);
-            const prod = produtos.find(p => p.id === item.idProd);
-            if(prod) prod.qtd += item.qtd;
-            posse = posse.filter(p => p.idPosse !== idPosse);
-            salvar();
-        }
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚙️ Configurar Setores</h3>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="novo-setor" placeholder="NOVO SETOR..." class="flex-1 border p-2 rounded-xl uppercase text-[10px] font-bold outline-none focus:border-vinho">
+                    <button onclick="adicionarSetor()" class="bg-vinho text-white px-4 rounded-xl font-bold hover:bg-opacity-90">+</button>
+                </div>
+                <div id="lista-setores-badges" class="flex flex-wrap gap-2"></div>
+            </div>
 
-        function render() {
-            const listaEstoque = document.getElementById('lista-estoque');
-            const listaAlugados = document.getElementById('lista-alugados');
-            const selectSaida = document.getElementById('m-id');
-            const selectSetor = document.getElementById('m-setor');
-            const configSetores = document.getElementById('lista-setores-config');
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho relative">
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Registrar Movimento</h3>
+                <div class="relative">
+                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3 focus:border-vinho">
+                    <div id="lista-busca" class="search-results hidden"></div>
+                </div>
+                <input type="hidden" id="m-id-selecionado">
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <select id="m-op" class="border p-3 rounded-xl font-black bg-gray-50 text-vinho uppercase text-xs">
+                        <option value="saida">Saída (-)</option>
+                        <option value="entrada">Entrada (+)</option>
+                    </select>
+                    <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl text-vinho">
+                </div>
+                <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
+                <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold uppercase"></select>
+                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition transform active:scale-95">Confirmar Agora</button>
+            </div>
 
-            configSetores.innerHTML = setores.map(s => `<span class="bg-white px-2 py-1 rounded-lg text-[10px] font-black border flex items-center gap-1 shadow-sm">${s}<button onclick="removerSetor('${s}')" class="text-red-600 font-bold ml-1">×</button></span>`).join('');
-            selectSetor.innerHTML = setores.map(s => `<option value="${s}">${s}</option>`).join('');
-
-            listaEstoque.innerHTML = '';
-            selectSaida.innerHTML = '<option value="">BUSCAR MATERIAL...</option>';
-            produtos.forEach(p => {
-                const pendentes = posse.filter(item => item.idProd === p.id);
-                let alertas = pendentes.map(q => `
-                    <div class="piscante-alerta">
-                        <span class="text-[10px]">⚠️ EM POSSE: ${q.func} (${q.qtd})</span>
-                        <button onclick="devolverFerramenta(${q.idPosse})" class="bg-white text-red-600 px-3 py-1 rounded-full text-[8px] font-black uppercase">Receber ✅</button>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-200">
+                <h3 class="font-black text-amber-600 mb-4 text-xs uppercase italic border-b pb-2">🤝 Gestão de Aluguéis</h3>
+                <div class="space-y-2 mb-4">
+                    <input type="text" id="aluguel-item" placeholder="EQUIPAMENTO" class="w-full border p-3 rounded-xl text-xs uppercase font-bold">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="date" id="aluguel-data" class="border p-3 rounded-xl text-xs font-bold">
+                        <input type="text" id="aluguel-fornecedor" placeholder="FORNECEDOR" class="border p-3 rounded-xl text-xs uppercase font-bold">
                     </div>
-                `).join('');
-
-                listaEstoque.innerHTML += `
-                    <tr class="border-b">
-                        <td class="p-4"><div class="font-black text-gray-800 text-sm tracking-tight">${p.nome}</div>${alertas}</td>
-                        <td class="p-4 text-center">
-                           <div class="font-black text-2xl ${p.qtd <= p.min ? 'text-red-600' : 'text-vinho-chiavari'}">${p.qtd}</div>
-                           <button onclick="ajustarSaldo(${p.id})" class="text-[9px] text-[#a67c52] font-black uppercase underline tracking-tighter">Ajustar Saldo</button>
-                        </td>
-                        <td class="p-4 text-right">
-                           <button onclick="if(confirm('Excluir?')){produtos=produtos.filter(x=>x.id!=${p.id});salvar();}" class="text-gray-300 text-[10px] hover:text-red-500 transition">Excluir</button>
-                        </td>
-                    </tr>`;
-                selectSaida.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
-            });
-
-            listaAlugados.innerHTML = alugueis.map(a => `
-                <tr class="border-b ${a.status === 'ATIVO' ? '' : 'opacity-40'}">
-                    <td class="p-3 font-bold uppercase text-gray-600">${a.item} (${a.empresa})</td>
-                    <td class="p-3 text-right">
-                        ${a.status === 'ATIVO' ? `<button onclick="devolverAluguel(${a.id})" class="bg-gray-800 text-white px-3 py-1 rounded text-[8px] font-black uppercase">Dar Baixa</button>` : `DEVOLVIDO`}
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function salvar() {
-            localStorage.setItem('ch_v12_p', JSON.stringify(produtos));
-            localStorage.setItem('ch_v12_po', JSON.stringify(posse));
-            localStorage.setItem('ch_v12_s', JSON.stringify(setores));
-            localStorage.setItem('ch_v12_a', JSON.stringify(alugueis));
-            localStorage.setItem('ch_v12_h', JSON.stringify(historicoSaidas));
-            render();
-        }
-
-        // --- PDF COM GRÁFICOS CHIAVARI ---
-        async function gerarRelatorioPDF() {
-            const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 40, 'F');
-            doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("CHIAVARI - RELATÓRIO OPERACIONAL", 14, 25);
+                    <button onclick="registrarAluguel()" class="w-full bg-amber-500 text-white p-3 rounded-xl font-black text-xs uppercase hover:bg-amber-600">Registrar Aluguel</button>
+                </div>
+                <div id="lista-alugueis" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
+            </div>
             
-            doc.setTextColor(0, 0, 0); doc.autoTable({ head: [['MATERIAL', 'SALDO', 'CONDIÇÃO']], body: produtos.map(p => [p.nome, p.qtd, p.qtd <= p.min ? 'REPOSIÇÃO' : 'ESTÁVEL']), startY: 50 });
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                 <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Atividades Recentes</h3>
+                 <div id="historico-lista" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+        </div>
 
-            doc.addPage(); doc.text("CONSUMO POR SETOR (%)", 14, 20);
-            const dSetor = {}; historicoSaidas.forEach(s => dSetor[s.setor] = (dSetor[s.setor] || 0) + s.qtd);
-            const imgSetor = await gerarImgGraf(Object.keys(dSetor), Object.values(dSetor), 'pie');
-            doc.addImage(imgSetor, 'PNG', 15, 30, 80, 80);
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden sticky top-4">
+                <div class="p-6 bg-gray-50/50 border-b">
+                    <h3 class="font-black text-vinho text-xs uppercase italic">📦 Monitor de Estoque Geral</h3>
+                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 FILTRAR ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100 mt-2 focus:ring-2 ring-vinho/10">
+                </div>
+                <div class="overflow-x-auto px-4 pb-4">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] uppercase text-gray-400 font-black tracking-widest border-b">
+                                <th class="p-4">Material / Produto</th>
+                                <th class="p-4 text-center">Saldo Atual</th>
+                                <th class="p-4 text-center">Status</th>
+                                <th class="p-4 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-corpo"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            doc.text("TOP CONSUMIDORES (FUNCIONÁRIOS)", 14, 130);
-            const dFunc = {}; historicoSaidas.forEach(s => dFunc[s.func] = (dFunc[s.func] || 0) + s.qtd);
-            const imgFunc = await gerarImgGraf(Object.keys(dFunc), Object.values(dFunc), 'bar');
-            doc.addImage(imgFunc, 'PNG', 15, 140, 160, 70);
+<div class="signature italic">Produced by J Guilherme A.C. | V9.5</div>
 
-            doc.save("Relatorio_Chiavari_Master.pdf");
+<div style="position: absolute; left: -9999px;">
+    <canvas id="canvasSetor" width="400" height="400"></canvas>
+</div>
+
+<script>
+    // ==========================================
+    // 1. CONFIGURAÇÃO E DADOS INICIAIS
+    // ==========================================
+    const PIN = "0000"; 
+    let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
+    let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
+    let setores = JSON.parse(localStorage.getItem('almox_setores')) || ["MONTAGEM", "PINTURA", "MARCENARIA"];
+    let alugueis = JSON.parse(localStorage.getItem('almox_alugueis')) || [];
+    let pendencias = JSON.parse(localStorage.getItem('almox_pendencias')) || [];
+
+    // ==========================================
+    // 2. INICIALIZAÇÃO E UTILITÁRIOS
+    // ==========================================
+    window.onload = () => {
+        const hoje = new Date();
+        const semanaPassada = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
+        document.getElementById('filtro-fim').value = hoje.toISOString().split('T')[0];
+        document.getElementById('filtro-inicio').value = semanaPassada.toISOString().split('T')[0];
+        
+        atualizarSelectSetores();
+        carregarLogoSalva(); // Nova função: Carrega a logo da empresa
+        executarLimpezaAutomatica(); // Nova função: Limpeza de logs antigos
+    };
+
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
+
+    function autenticar() {
+        if(document.getElementById('pin-input').value === PIN) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            render(); renderAlugueis(); renderPendencias();
+        } else { alert("ACESSO NEGADO"); }
+    }
+
+    // ==========================================
+    // 3. LOGO DA EMPRESA (NOVA FUNCIONALIDADE)
+    // ==========================================
+    function salvarLogo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function() {
+                // Redimensionar para economizar espaço
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const maxW = 150, maxH = 150;
+                let w = img.width, h = img.height;
+                
+                if (w > h) { if (w > maxW) { h *= maxW / w; w = maxW; } } 
+                else { if (h > maxH) { w *= maxH / h; h = maxH; } }
+
+                canvas.width = w; canvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                
+                const dataURL = canvas.toDataURL('image/png');
+                localStorage.setItem('almox_logo_img', dataURL);
+                document.getElementById('img-logo').src = dataURL;
+            };
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function carregarLogoSalva() {
+        const logo = localStorage.getItem('almox_logo_img');
+        if (logo) document.getElementById('img-logo').src = logo;
+    }
+
+    // ==========================================
+    // 4. LIMPEZA AUTOMÁTICA (NOVA FUNCIONALIDADE)
+    // ==========================================
+    function executarLimpezaAutomatica() {
+        const DIAS_PARA_MANTER = 60; // Configuração de Dias
+        const dataLimite = Date.now() - (DIAS_PARA_MANTER * 24 * 60 * 60 * 1000);
+        const logsAntes = logs.length;
+
+        // Filtra mantendo apenas os logs mais novos que a data limite
+        logs = logs.filter(log => log.t > dataLimite);
+
+        if (logs.length < logsAntes) {
+            console.log(`Limpeza Auto: ${logsAntes - logs.length} registros antigos removidos.`);
+            salvar();
         }
+    }
 
-        function gerarImgGraf(labels, data, type) {
-            return new Promise(resolve => {
-                const ctx = document.getElementById('canvasSuporte').getContext('2d');
-                if (window.myChart) window.myChart.destroy();
-                window.myChart = new Chart(ctx, {
-                    type: type, data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#4d0011', '#a67c52', '#d1c7b7', '#2a0009', '#5c4033'] }] },
-                    options: { animation: false, devicePixelRatio: 2 }
-                });
-                setTimeout(() => resolve(document.getElementById('canvasSuporte').toDataURL('image/png')), 600);
-            });
+    // ==========================================
+    // 5. LÓGICA DE SETORES
+    // ==========================================
+    function atualizarSelectSetores() {
+        const select = document.getElementById('m-setor');
+        const container = document.getElementById('lista-setores-badges');
+        select.innerHTML = '<option value="">-- SELECIONE O SETOR --</option>';
+        container.innerHTML = '';
+        setores.forEach((s, i) => {
+            select.innerHTML += `<option value="${s}">${s}</option>`;
+            container.innerHTML += `<span class="bg-gray-100 text-vinho px-3 py-1 rounded-full text-[9px] font-black flex items-center gap-2 border border-vinho/10">${s} <button onclick="removerSetor(${i})" class="text-red-500 hover:text-red-700">×</button></span>`;
+        });
+        localStorage.setItem('almox_setores', JSON.stringify(setores));
+    }
+
+    function adicionarSetor() {
+        const nome = document.getElementById('novo-setor').value.toUpperCase().trim();
+        if(nome && !setores.includes(nome)) {
+            setores.push(nome);
+            document.getElementById('novo-setor').value = '';
+            atualizarSelectSetores();
         }
+    }
 
-        render();
-    </script>
-</body>
-</html>
+    function removerSetor(index) {
+        if(confirm("Remover este setor?")) { setores.splice(index, 1); atualizarSelectSetores(); }
+    }
+
+    // ==========================================
+    // 6. LÓGICA DE PRODUTOS
+    // ==========================================
+    function salvarProduto() {
+        const id = document.getElementById('edit-id').value;
+        const nome = document.getElementById('p-nome').value.toUpperCase();
+        const tipo = document.getElementById('p-tipo').value;
+        const min = parseInt(document.getElementById('p-min').value) || 0;
+        const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
+        
+        if(!nome) return alert("Preencha o nome do material!");
+        
+        if(id) {
+            const idx = produtos.findIndex(p => p.id == id);
+            produtos[idx] = { ...
