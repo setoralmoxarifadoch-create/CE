@@ -3,48 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO V8.8 - GESTÃO DE SETORES</title>
+    <title>ALMOXARIFADO MASTER V11 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root { --vinho: #4d0011; }
         body { background-color: #ffffff; font-family: 'Inter', sans-serif; }
         .bg-vinho { background-color: var(--vinho); }
-        .text-vinho { color: var(--vinho); }
-        .btn-setor-delete { color: #ef4444; font-weight: bold; margin-left: 8px; cursor: pointer; }
-        .btn-setor-delete:hover { color: #b91c1c; }
+        .piscante-alerta { color: #e11d48; font-weight: 900; animation: blink 0.8s infinite; background: #fff1f2; border: 1px solid #fda4af; padding: 6px; border-radius: 6px; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     </style>
 </head>
 <body class="p-4">
 
-    <header class="bg-vinho text-white p-6 rounded-xl mb-6 shadow-lg">
-        <h1 class="text-2xl font-black uppercase italic">Master V8.8 - J. Guilherme</h1>
-        <p class="text-xs opacity-60">Controle de Setores e Estoque</p>
+    <header class="bg-vinho text-white p-6 rounded-xl mb-6 flex justify-between items-center shadow-lg">
+        <div>
+            <h1 class="text-2xl font-black uppercase italic">Master V11 - J. Guilherme</h1>
+            <p id="clock" class="text-xs opacity-60 font-mono"></p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="gerarRelatorioPDF()" class="bg-white text-vinho px-4 py-2 rounded-lg font-black uppercase text-xs">📊 PDF Estoque</button>
+            <button onclick="gerarPDFAluguel()" class="bg-amber-500 text-white px-4 py-2 rounded-lg font-black uppercase text-xs">📋 PDF Aluguel</button>
+        </div>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         <div class="lg:col-span-4 space-y-6">
             
-            <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm">
-                <h3 class="font-black text-gray-700 mb-4 text-xs uppercase italic">⚙️ Configurar Setores</h3>
-                
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="input-novo-setor" placeholder="NOME DO SETOR" 
-                           class="flex-1 border p-2 rounded text-xs uppercase font-bold outline-none focus:border-vinho">
-                    <button onclick="adicionarSetor()" 
-                            class="bg-green-600 text-white px-4 rounded font-bold hover:bg-green-700 transition">+</button>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <h3 class="font-black text-gray-700 mb-3 text-xs uppercase italic">⚙️ Configurar Setores</h3>
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="novo-setor" placeholder="Nome do Setor" class="flex-1 border p-2 rounded text-xs uppercase font-bold outline-none">
+                    <button onclick="adicionarSetor()" class="bg-green-600 text-white px-4 rounded font-bold hover:bg-green-700">+</button>
                 </div>
-
-                <p class="text-[10px] font-black text-gray-400 mb-2 uppercase">Setores Ativos:</p>
-                <div id="container-setores" class="flex flex-wrap gap-2">
-                    </div>
+                <div id="lista-setores-config" class="flex flex-wrap gap-2"></div>
             </div>
 
             <div class="bg-white p-5 rounded-xl shadow-sm border">
                 <h3 class="font-black text-vinho mb-3 text-xs uppercase italic">📝 Cadastro de Itens</h3>
                 <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-2 rounded mb-2 uppercase font-bold text-xs outline-none">
-                <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-2 rounded text-center font-bold text-lg mb-3">
-                <button onclick="salvarProduto()" class="w-full bg-vinho text-white p-2 rounded font-black uppercase text-xs hover:brightness-110">Cadastrar</button>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <select id="p-tipo" class="border p-2 rounded text-xs font-bold uppercase cursor-pointer">
+                        <option value="Insumo">Insumo</option>
+                        <option value="Ferramenta">Ferramenta</option>
+                    </select>
+                    <input type="number" id="p-min" placeholder="Mín" class="border p-2 rounded text-center text-xs font-bold">
+                </div>
+                <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-2 rounded text-center font-bold text-lg mb-3 outline-none">
+                <button onclick="salvarProduto()" class="w-full bg-vinho text-white p-2 rounded font-black uppercase text-xs hover:brightness-110">Salvar Item</button>
+            </div>
+
+            <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 shadow-sm">
+                <h3 class="font-black text-amber-700 mb-3 text-xs uppercase italic">🤝 Registro de Aluguel</h3>
+                <input type="text" id="alu-item" placeholder="O QUE FOI ALUGADO?" class="w-full border p-2 rounded mb-2 text-xs uppercase font-bold outline-none">
+                <input type="text" id="alu-empresa" placeholder="EMPRESA / FORNECEDOR" class="w-full border p-2 rounded mb-2 text-xs uppercase font-bold outline-none">
+                <div class="grid grid-cols-1 gap-1 mb-3">
+                    <label class="text-[9px] font-bold">DATA DE ENTRADA:</label>
+                    <input type="date" id="alu-data" class="border p-2 rounded text-xs cursor-pointer">
+                </div>
+                <button onclick="registrarAluguel()" class="w-full bg-amber-600 text-white p-2 rounded font-black uppercase text-xs hover:bg-amber-700 shadow-md">Salvar Aluguel</button>
             </div>
         </div>
 
@@ -53,141 +72,164 @@
             <div class="bg-white p-5 rounded-xl shadow-xl border-t-4 border-vinho">
                 <h3 class="font-black text-vinho mb-3 text-xs uppercase italic">⚡ Registrar Saída</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <select id="m-id" class="border p-2 rounded text-xs font-bold uppercase"></select>
-                    
-                    <select id="select-setores-saida" class="border p-2 rounded text-xs font-bold uppercase cursor-pointer bg-yellow-50"></select>
-                    
+                    <select id="m-id" class="border p-2 rounded text-xs font-bold uppercase cursor-pointer"></select>
+                    <select id="m-setor" class="border p-2 rounded text-xs font-bold uppercase cursor-pointer"></select>
                     <input type="number" id="m-qtd" placeholder="Qtd" class="border p-2 rounded font-black text-center text-xl outline-none">
-                    <input type="text" id="m-func" placeholder="NOME DO FUNCIONÁRIO" class="border p-2 rounded uppercase text-xs font-bold outline-none">
+                    <input type="text" id="m-func" placeholder="QUEM ESTÁ RETIRANDO?" class="border p-2 rounded uppercase text-xs font-bold outline-none">
                 </div>
-                <button onclick="registrarSaida()" class="w-full mt-3 bg-green-600 text-white p-3 rounded font-black uppercase text-sm hover:bg-green-700 shadow-lg transition">Confirmar Saída</button>
+                <button onclick="registrarSaida()" class="w-full mt-3 bg-green-600 text-white p-3 rounded font-black uppercase text-sm hover:bg-green-700 transition shadow-lg">Confirmar Saída</button>
             </div>
 
             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                 <table class="w-full text-left">
                     <thead class="bg-gray-100 text-[10px] font-black uppercase text-gray-500 border-b">
-                        <tr><th class="p-3">Material</th><th class="p-3 text-center">Saldo</th><th class="p-3 text-right">Ação</th></tr>
+                        <tr><th class="p-3">Material / Pendência</th><th class="p-3 text-center">Saldo</th><th class="p-3 text-right">Ação</th></tr>
                     </thead>
                     <tbody id="lista-estoque"></tbody>
+                </table>
+            </div>
+
+            <div class="bg-amber-50 rounded-xl border border-amber-200 overflow-hidden shadow-sm">
+                <div class="p-3 bg-amber-600 text-white font-black text-xs uppercase">Histórico de Itens Alugados</div>
+                <table class="w-full text-left text-[10px]">
+                    <thead class="bg-amber-100 font-black uppercase text-amber-800">
+                        <tr><th class="p-2">Item</th><th class="p-2">Fornecedor</th><th class="p-2">Entrada</th><th class="p-2">Status</th></tr>
+                    </thead>
+                    <tbody id="lista-alugados"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // Inicia com alguns setores padrão, mas você pode remover todos
-        let setores = JSON.parse(localStorage.getItem('setores_jguilherme')) || ["MONTAGEM", "PINTURA", "SHOWROOM"];
-        let produtos = JSON.parse(localStorage.getItem('produtos_jguilherme')) || [];
+        // GAVETAS LIMPAS (DADOS NOVOS)
+        let produtos = JSON.parse(localStorage.getItem('j_final_prods')) || [];
+        let posse = JSON.parse(localStorage.getItem('j_final_posse')) || [];
+        let setores = JSON.parse(localStorage.getItem('j_final_setores')) || ["MONTAGEM", "PINTURA", "MARCENARIA"];
+        let alugueis = JSON.parse(localStorage.getItem('j_final_alugueis')) || [];
 
-        // --- FUNÇÕES DE SETORES ---
-
-        function renderizarSetores() {
-            const container = document.getElementById('container-setores');
-            const selectSaida = document.getElementById('select-setores-saida');
-            
-            // Limpa tudo antes de desenhar
-            container.innerHTML = '';
-            selectSaida.innerHTML = '';
-
-            setores.forEach((setor, index) => {
-                // Cria a "etiqueta" na barra de opções
-                const tag = document.createElement('span');
-                tag.className = "bg-white border border-gray-300 px-3 py-1 rounded-full text-[10px] font-bold flex items-center shadow-sm text-gray-700";
-                tag.innerHTML = `${setor} <span class="btn-setor-delete" onclick="removerSetor(${index})">×</span>`;
-                container.appendChild(tag);
-
-                // Adiciona a opção no select de Saída
-                const option = document.createElement('option');
-                option.value = setor;
-                option.text = setor;
-                selectSaida.appendChild(option);
-            });
-
-            localStorage.setItem('setores_jguilherme', JSON.stringify(setores));
-        }
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
 
         function adicionarSetor() {
-            const input = document.getElementById('input-novo-setor');
-            const nome = input.value.trim().toUpperCase();
-            
-            if (nome === "") return;
-            if (setores.includes(nome)) {
-                alert("Este setor já existe!");
-                return;
-            }
+            const nome = document.getElementById('novo-setor').value.toUpperCase();
+            if(nome && !setores.includes(nome)) { setores.push(nome); salvar(); document.getElementById('novo-setor').value = ''; }
+        }
+        function removerSetor(nome) { setores = setores.filter(s => s !== nome); salvar(); }
 
-            setores.push(nome);
-            input.value = '';
-            renderizarSetores();
+        function registrarAluguel() {
+            const item = document.getElementById('alu-item').value.toUpperCase();
+            const empresa = document.getElementById('alu-empresa').value.toUpperCase();
+            const data = document.getElementById('alu-data').value;
+            if(!item || !empresa) return alert("Preencha os campos!");
+            alugueis.unshift({ id: Date.now(), item, empresa, data, status: 'ATIVO' });
+            salvar();
+            document.getElementById('alu-item').value = ''; document.getElementById('alu-empresa').value = '';
         }
 
-        function removerSetor(index) {
-            if (confirm("Deseja remover este setor da lista?")) {
-                setores.splice(index, 1);
-                renderizarSetores();
-            }
+        function devolverAluguel(id) {
+            const alu = alugueis.find(a => a.id === id);
+            alu.status = 'DEVOLVIDO'; alu.dataDev = new Date().toLocaleDateString();
+            salvar();
         }
-
-        // --- FUNÇÕES DE ESTOQUE ---
 
         function salvarProduto() {
             const nome = document.getElementById('p-nome').value.toUpperCase();
+            const tipo = document.getElementById('p-tipo').value;
+            const min = parseInt(document.getElementById('p-min').value) || 0;
             const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
             if(!nome) return;
-            produtos.push({ id: Date.now(), nome, qtd });
-            salvarDados();
-            document.getElementById('p-nome').value = ''; 
-            document.getElementById('p-qtd').value = '';
+            produtos.push({ id: Date.now(), nome, tipo, min, qtd });
+            salvar();
+            document.getElementById('p-nome').value = ''; document.getElementById('p-qtd').value = '';
         }
 
         function registrarSaida() {
             const id = document.getElementById('m-id').value;
             const qtd = parseInt(document.getElementById('m-qtd').value);
-            const func = document.getElementById('m-func').value;
+            const func = document.getElementById('m-func').value.toUpperCase();
+            const setor = document.getElementById('m-setor').value;
             if(!id || !qtd || !func) return alert("Preencha tudo!");
-            
             const p = produtos.find(item => item.id == id);
-            if(p.qtd < qtd) return alert("Saldo insuficiente!");
-            
+            if(p.qtd < qtd) return alert("SALDO INSUFICIENTE!");
             p.qtd -= qtd;
-            salvarDados();
-            document.getElementById('m-func').value = ''; 
-            document.getElementById('m-qtd').value = '';
+            if(p.tipo === 'Ferramenta') posse.push({ idPosse: Date.now(), idProd: p.id, nome: p.nome, func: func, qtd: qtd });
+            salvar();
+            document.getElementById('m-func').value = ''; document.getElementById('m-qtd').value = '';
         }
 
-        function renderizarEstoque() {
-            const lista = document.getElementById('lista-estoque');
-            const selectProd = document.getElementById('m-id');
-            lista.innerHTML = '';
-            selectProd.innerHTML = '<option value="">MATERIAL...</option>';
+        function devolverFerramenta(idPosse) {
+            const item = posse.find(p => p.idPosse === idPosse);
+            const prod = produtos.find(p => p.id === item.idProd);
+            if(prod) prod.qtd += item.qtd;
+            posse = posse.filter(p => p.idPosse !== idPosse);
+            salvar();
+        }
 
+        function render() {
+            const listaEstoque = document.getElementById('lista-estoque');
+            const listaAlugados = document.getElementById('lista-alugados');
+            const selectSaida = document.getElementById('m-id');
+            const selectSetor = document.getElementById('m-setor');
+            const configSetores = document.getElementById('lista-setores-config');
+
+            configSetores.innerHTML = setores.map(s => `<span class="bg-gray-200 px-2 py-1 rounded text-[10px] font-black border flex items-center gap-1">${s}<button onclick="removerSetor('${s}')" class="text-red-600 px-1 font-bold">×</button></span>`).join('');
+            selectSetor.innerHTML = setores.map(s => `<option value="${s}">${s}</option>`).join('');
+
+            listaEstoque.innerHTML = '';
+            selectSaida.innerHTML = '<option value="">MATERIAL...</option>';
             produtos.forEach(p => {
-                lista.innerHTML += `
+                const pendentes = posse.filter(item => item.idProd === p.id);
+                let alertas = pendentes.map(q => `
+                    <div class="piscante-alerta">
+                        <span class="text-[10px]">⚠️ COM: ${q.func} (${q.qtd})</span>
+                        <button onclick="devolverFerramenta(${q.idPosse})" class="bg-vinho text-white px-2 py-1 rounded text-[8px] font-black">DAR BAIXA ✅</button>
+                    </div>
+                `).join('');
+
+                listaEstoque.innerHTML += `
                     <tr class="border-b">
-                        <td class="p-3 font-bold text-gray-800 text-sm">${p.nome}</td>
-                        <td class="p-3 text-center font-black text-xl text-vinho">${p.qtd}</td>
-                        <td class="p-3 text-right">
-                            <button onclick="excluirProd(${p.id})" class="text-gray-300 text-[10px] hover:text-red-600">Excluir</button>
-                        </td>
+                        <td class="p-3"><div class="font-bold text-gray-800">${p.nome}</div>${alertas}</td>
+                        <td class="p-3 text-center font-black text-xl ${p.qtd <= p.min ? 'text-red-600' : 'text-vinho'}">${p.qtd}</td>
+                        <td class="p-3 text-right"><button onclick="produtos=produtos.filter(x=>x.id!=${p.id});salvar();" class="text-gray-300 text-[9px]">Excluir</button></td>
                     </tr>`;
-                selectProd.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+                selectSaida.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
             });
+
+            listaAlugados.innerHTML = alugueis.map(a => `
+                <tr class="border-b ${a.status === 'ATIVO' ? '' : 'opacity-50'}">
+                    <td class="p-2 font-bold">${a.item}</td>
+                    <td class="p-2">${a.empresa}</td>
+                    <td class="p-2">${a.data}</td>
+                    <td class="p-2">
+                        ${a.status === 'ATIVO' ? `<button onclick="devolverAluguel(${a.id})" class="bg-green-600 text-white px-2 py-1 rounded font-black">DEVOLVER</button>` : `OK: ${a.dataDev}`}
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        function excluirProd(id) {
-            produtos = produtos.filter(p => p.id !== id);
-            salvarDados();
+        function salvar() {
+            localStorage.setItem('j_final_prods', JSON.stringify(produtos));
+            localStorage.setItem('j_final_posse', JSON.stringify(posse));
+            localStorage.setItem('j_final_setores', JSON.stringify(setores));
+            localStorage.setItem('j_final_alugueis', JSON.stringify(alugueis));
+            render();
         }
 
-        function salvarDados() {
-            localStorage.setItem('produtos_jguilherme', JSON.stringify(produtos));
-            renderizarEstoque();
+        function gerarRelatorioPDF() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.text("ESTOQUE ATUAL", 14, 15);
+            doc.autoTable({ head: [['Item', 'Saldo']], body: produtos.map(p => [p.nome, p.qtd]), startY: 20 });
+            doc.save("Estoque.pdf");
         }
 
-        // Inicialização
-        renderizarSetores();
-        renderizarEstoque();
+        function gerarPDFAluguel() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.text("ALUGUEIS", 14, 15);
+            doc.autoTable({ head: [['Item', 'Empresa', 'Entrada', 'Status']], body: alugueis.map(a => [a.item, a.empresa, a.data, a.status]), startY: 20 });
+            doc.save("Alugueis.pdf");
+        }
 
+        render();
     </script>
 </body>
 </html>
