@@ -1,468 +1,468 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V9.2 - J. GUILHERME</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root { --vinho: #4d0011; }
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-user-select: none; user-select: none; }
-        .bg-vinho { background-color: var(--vinho); }
-        .text-vinho { color: var(--vinho); }
-        .status-vermelho { background: #e11d48; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .card-dash { background: white; padding: 20px; border-radius: 16px; border-bottom: 4px solid var(--vinho); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
-        .hidden { display: none; }
-        .pendencia-card { border-left: 4px solid #e11d48; background: #fff1f2; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALMOXARIFADO INTELLIGENT V9.2 - J. GUILHERME</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --vinho: #4d0011; }
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-user-select: none; user-select: none; }
+        .bg-vinho { background-color: var(--vinho); }
+        .text-vinho { color: var(--vinho); }
+        .status-vermelho { background: #e11d48; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .card-dash { background: white; padding: 20px; border-radius: 16px; border-bottom: 4px solid var(--vinho); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
+        .hidden { display: none; }
+        .pendencia-card { border-left: 4px solid #e11d48; background: #fff1f2; }
+    </style>
 </head>
 <body oncontextmenu="return false;">
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
-    <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.2</h2>
-        <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
-        <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
-        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
-    </div>
+    <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.2</h2>
+        <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
+        <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
+        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
+    </div>
 </div>
 
 <div id="app" class="hidden p-4 max-w-7xl mx-auto pb-16">
-    <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
-        <div class="text-center lg:text-left">
-            <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
-            <p id="clock" class="text-sm font-mono opacity-60"></p>
-        </div>
-        
-        <div class="flex flex-wrap items-center bg-white/10 p-3 rounded-2xl gap-3">
-            <div class="text-[10px] font-bold uppercase">Relatórios:</div>
-            <input type="date" id="filtro-inicio" class="text-black text-xs p-1 rounded">
-            <input type="date" id="filtro-fim" class="text-black text-xs p-1 rounded">
-            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço</button>
-            <button onclick="gerarRelatorioAluguel()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">🤝 Aluguéis</button>
-        </div>
+    <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
+        <div class="text-center lg:text-left">
+            <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
+            <p id="clock" class="text-sm font-mono opacity-60"></p>
+        </div>
+        
+        <div class="flex flex-wrap items-center bg-white/10 p-3 rounded-2xl gap-3">
+            <div class="text-[10px] font-bold uppercase">Relatórios:</div>
+            <input type="date" id="filtro-inicio" class="text-black text-xs p-1 rounded">
+            <input type="date" id="filtro-fim" class="text-black text-xs p-1 rounded">
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço</button>
+            <button onclick="gerarRelatorioAluguel()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">🤝 Aluguéis</button>
+        </div>
 
-        <div class="flex gap-2">
-            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">💾 BKP</button>
-            <button onclick="document.getElementById('import-f').click()" class="bg-gray-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase italic">Restaurar</button>
-            <input type="file" id="import-f" onchange="importarBackup(event)" class="hidden">
-        </div>
-    </header>
+        <div class="flex gap-2">
+            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">💾 BKP</button>
+            <button onclick="document.getElementById('import-f').click()" class="bg-gray-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase italic">Restaurar</button>
+            <input type="file" id="import-f" onchange="importarBackup(event)" class="hidden">
+        </div>
+    </header>
 
-    <div id="painel-pendencias" class="mb-8 hidden">
-        <h3 class="font-black text-red-600 mb-3 text-xs uppercase italic flex items-center gap-2">⚠️ Ferramentas em Uso (Pendentes de Devolução)</h3>
-        <div id="lista-pendencias" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-    </div>
+    <div id="painel-pendencias" class="mb-8 hidden">
+        <h3 class="font-black text-red-600 mb-3 text-xs uppercase italic flex items-center gap-2">⚠️ Ferramentas em Uso (Pendentes de Devolução)</h3>
+        <div id="lista-pendencias" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Reposição Urgente</p>
-            <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
-        </div>
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Movimentos (7d)</p>
-            <h2 id="dash-saidas" class="text-3xl font-black text-blue-600">0</h2>
-        </div>
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Total em Peças</p>
-            <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
-        </div>
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Aluguéis Ativos</p>
-            <h2 id="dash-aluguel" class="text-3xl font-black text-amber-500">0</h2>
-        </div>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Reposição Urgente</p>
+            <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
+        </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Movimentos (7d)</p>
+            <h2 id="dash-saidas" class="text-3xl font-black text-blue-600">0</h2>
+        </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Total em Peças</p>
+            <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
+        </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Aluguéis Ativos</p>
+            <h2 id="dash-aluguel" class="text-3xl font-black text-amber-500">0</h2>
+        </div>
+    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-4 space-y-6">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 id="form-title" class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Gestão de Produto</h3>
-                <input type="hidden" id="edit-id">
-                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-vinho/10 uppercase font-bold text-sm">
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
-                        <option value="Insumo">Insumo (📦)</option>
-                        <option value="Ferramenta">Ferramenta (🛠️)</option>
-                    </select>
-                    <input type="number" id="p-min" placeholder="Min" class="border p-3 rounded-xl text-center font-bold">
-                </div>
-                <div id="div-qtd-inicial" class="mb-3">
-                    <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-xl">
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho text-white p-4 rounded-2xl font-black uppercase text-xs">Salvar</button>
-                    <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-200 text-gray-600 px-6 rounded-2xl font-black">X</button>
-                </div>
-            </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-4 space-y-6">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 id="form-title" class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Gestão de Produto</h3>
+                <input type="hidden" id="edit-id">
+                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-vinho/10 uppercase font-bold text-sm">
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
+                        <option value="Insumo">Insumo (📦)</option>
+                        <option value="Ferramenta">Ferramenta (🛠️)</option>
+                    </select>
+                    <input type="number" id="p-min" placeholder="Min" class="border p-3 rounded-xl text-center font-bold">
+                </div>
+                <div id="div-qtd-inicial" class="mb-3">
+                    <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-xl">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho text-white p-4 rounded-2xl font-black uppercase text-xs">Salvar</button>
+                    <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-200 text-gray-600 px-6 rounded-2xl font-black">X</button>
+                </div>
+            </div>
 
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚙️ Configurar Setores</h3>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="novo-setor" placeholder="NOVO SETOR..." class="flex-1 border p-2 rounded-xl uppercase text-[10px] font-bold outline-none focus:border-vinho">
-                    <button onclick="adicionarSetor()" class="bg-vinho text-white px-4 rounded-xl font-bold">+</button>
-                </div>
-                <div id="lista-setores-badges" class="flex flex-wrap gap-2"></div>
-            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚙️ Configurar Setores</h3>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="novo-setor" placeholder="NOVO SETOR..." class="flex-1 border p-2 rounded-xl uppercase text-[10px] font-bold outline-none focus:border-vinho">
+                    <button onclick="adicionarSetor()" class="bg-vinho text-white px-4 rounded-xl font-bold">+</button>
+                </div>
+                <div id="lista-setores-badges" class="flex flex-wrap gap-2"></div>
+            </div>
 
-            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Registrar Movimento</h3>
-                <div class="relative">
-                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3 focus:border-vinho">
-                    <div id="lista-busca" class="search-results hidden"></div>
-                </div>
-                <input type="hidden" id="m-id-selecionado">
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <select id="m-op" class="border p-3 rounded-xl font-black bg-gray-50 text-vinho uppercase text-xs">
-                        <option value="saida">Saída (-)</option>
-                        <option value="entrada">Entrada (+)</option>
-                    </select>
-                    <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl text-vinho">
-                </div>
-                <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
-                <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold uppercase"></select>
-                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Agora</button>
-            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho">
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Registrar Movimento</h3>
+                <div class="relative">
+                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3 focus:border-vinho">
+                    <div id="lista-busca" class="search-results hidden"></div>
+                </div>
+                <input type="hidden" id="m-id-selecionado">
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <select id="m-op" class="border p-3 rounded-xl font-black bg-gray-50 text-vinho uppercase text-xs">
+                        <option value="saida">Saída (-)</option>
+                        <option value="entrada">Entrada (+)</option>
+                    </select>
+                    <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl text-vinho">
+                </div>
+                <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
+                <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold uppercase"></select>
+                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Agora</button>
+            </div>
 
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-200">
-                <h3 class="font-black text-amber-600 mb-4 text-xs uppercase italic border-b pb-2">🤝 Gestão de Aluguéis</h3>
-                <div class="space-y-2 mb-4">
-                    <input type="text" id="aluguel-item" placeholder="EQUIPAMENTO" class="w-full border p-3 rounded-xl text-xs uppercase font-bold">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="date" id="aluguel-data" class="border p-3 rounded-xl text-xs">
-                        <input type="text" id="aluguel-fornecedor" placeholder="FORNECEDOR" class="border p-3 rounded-xl text-xs uppercase font-bold">
-                    </div>
-                    <button onclick="registrarAluguel()" class="w-full bg-amber-500 text-white p-3 rounded-xl font-black text-xs uppercase">Registrar Aluguel</button>
-                </div>
-                <div id="lista-alugueis" class="space-y-3"></div>
-            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-200">
+                <h3 class="font-black text-amber-600 mb-4 text-xs uppercase italic border-b pb-2">🤝 Gestão de Aluguéis</h3>
+                <div class="space-y-2 mb-4">
+                    <input type="text" id="aluguel-item" placeholder="EQUIPAMENTO" class="w-full border p-3 rounded-xl text-xs uppercase font-bold">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="date" id="aluguel-data" class="border p-3 rounded-xl text-xs">
+                        <input type="text" id="aluguel-fornecedor" placeholder="FORNECEDOR" class="border p-3 rounded-xl text-xs uppercase font-bold">
+                    </div>
+                    <button onclick="registrarAluguel()" class="w-full bg-amber-500 text-white p-3 rounded-xl font-black text-xs uppercase">Registrar Aluguel</button>
+                </div>
+                <div id="lista-alugueis" class="space-y-3"></div>
+            </div>
 
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                 <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Atividades Recentes</h3>
-                 <div id="historico-lista" class="space-y-2"></div>
-            </div>
-        </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                 <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Atividades Recentes</h3>
+                 <div id="historico-lista" class="space-y-2"></div>
+            </div>
+        </div>
 
-        <div class="lg:col-span-8">
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden sticky top-4">
-                <div class="p-6 bg-gray-50/50 border-b">
-                    <h3 class="font-black text-vinho text-xs uppercase italic">📦 Monitor de Estoque</h3>
-                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 BUSCAR NO ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100 mt-2">
-                </div>
-                <div class="overflow-x-auto px-4 pb-4">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-[10px] uppercase text-gray-400 font-black tracking-widest">
-                                <th class="p-4">Material</th>
-                                <th class="p-4 text-center">Saldo</th>
-                                <th class="p-4 text-center">Status</th>
-                                <th class="p-4 text-right">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-corpo"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden sticky top-4">
+                <div class="p-6 bg-gray-50/50 border-b">
+                    <h3 class="font-black text-vinho text-xs uppercase italic">📦 Monitor de Estoque</h3>
+                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 BUSCAR NO ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100 mt-2">
+                </div>
+                <div class="overflow-x-auto px-4 pb-4">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] uppercase text-gray-400 font-black tracking-widest">
+                                <th class="p-4">Material</th>
+                                <th class="p-4 text-center">Saldo</th>
+                                <th class="p-4 text-center">Status</th>
+                                <th class="p-4 text-right">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-corpo"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="signature italic">Produced by J Guilherme A.C. | V9.2</div>
 
 <div style="position: absolute; left: -9999px;">
-    <canvas id="canvasSetor" width="300" height="300"></canvas>
+    <canvas id="canvasSetor" width="300" height="300"></canvas>
 </div>
 
 <script>
-    const PIN = "0000"; 
-    let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
-    let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
-    let setores = JSON.parse(localStorage.getItem('almox_setores')) || ["MONTAGEM", "PINTURA", "MARCENARIA"];
-    let alugueis = JSON.parse(localStorage.getItem('almox_alugueis')) || [];
-    let pendencias = JSON.parse(localStorage.getItem('almox_pendencias')) || [];
+    const PIN = "0000"; 
+    let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
+    let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
+    let setores = JSON.parse(localStorage.getItem('almox_setores')) || ["MONTAGEM", "PINTURA", "MARCENARIA"];
+    let alugueis = JSON.parse(localStorage.getItem('almox_alugueis')) || [];
+    let pendencias = JSON.parse(localStorage.getItem('almox_pendencias')) || [];
 
-    window.onload = () => {
-        const hoje = new Date();
-        const semanaPassada = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
-        document.getElementById('filtro-fim').value = hoje.toISOString().split('T')[0];
-        document.getElementById('filtro-inicio').value = semanaPassada.toISOString().split('T')[0];
-        atualizarSelectSetores();
-    };
+    window.onload = () => {
+        const hoje = new Date();
+        const semanaPassada = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
+        document.getElementById('filtro-fim').value = hoje.toISOString().split('T')[0];
+        document.getElementById('filtro-inicio').value = semanaPassada.toISOString().split('T')[0];
+        atualizarSelectSetores();
+    };
 
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
 
-    function autenticar() {
-        if(document.getElementById('pin-input').value === PIN) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            render(); renderAlugueis(); renderPendencias();
-        } else { alert("ACESSO NEGADO"); }
-    }
+    function autenticar() {
+        if(document.getElementById('pin-input').value === PIN) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            render(); renderAlugueis(); renderPendencias();
+        } else { alert("ACESSO NEGADO"); }
+    }
 
-    // --- LOGICA DE SETORES ---
-    function atualizarSelectSetores() {
-        const select = document.getElementById('m-setor');
-        const container = document.getElementById('lista-setores-badges');
-        select.innerHTML = '<option value="">-- SELECIONE O SETOR --</option>';
-        container.innerHTML = '';
-        setores.forEach((s, i) => {
-            select.innerHTML += `<option value="${s}">${s}</option>`;
-            container.innerHTML += `<span class="bg-gray-100 text-vinho px-3 py-1 rounded-full text-[9px] font-black flex items-center gap-2 border border-vinho/10">${s} <button onclick="removerSetor(${i})" class="text-red-500">×</button></span>`;
-        });
-        localStorage.setItem('almox_setores', JSON.stringify(setores));
-    }
+    // --- LOGICA DE SETORES ---
+    function atualizarSelectSetores() {
+        const select = document.getElementById('m-setor');
+        const container = document.getElementById('lista-setores-badges');
+        select.innerHTML = '<option value="">-- SELECIONE O SETOR --</option>';
+        container.innerHTML = '';
+        setores.forEach((s, i) => {
+            select.innerHTML += `<option value="${s}">${s}</option>`;
+            container.innerHTML += `<span class="bg-gray-100 text-vinho px-3 py-1 rounded-full text-[9px] font-black flex items-center gap-2 border border-vinho/10">${s} <button onclick="removerSetor(${i})" class="text-red-500">×</button></span>`;
+        });
+        localStorage.setItem('almox_setores', JSON.stringify(setores));
+    }
 
-    function adicionarSetor() {
-        const nome = document.getElementById('novo-setor').value.toUpperCase().trim();
-        if(nome && !setores.includes(nome)) {
-            setores.push(nome);
-            document.getElementById('novo-setor').value = '';
-            atualizarSelectSetores();
-        }
-    }
+    function adicionarSetor() {
+        const nome = document.getElementById('novo-setor').value.toUpperCase().trim();
+        if(nome && !setores.includes(nome)) {
+            setores.push(nome);
+            document.getElementById('novo-setor').value = '';
+            atualizarSelectSetores();
+        }
+    }
 
-    function removerSetor(index) {
-        if(confirm("Remover setor?")) { setores.splice(index, 1); atualizarSelectSetores(); }
-    }
+    function removerSetor(index) {
+        if(confirm("Remover setor?")) { setores.splice(index, 1); atualizarSelectSetores(); }
+    }
 
-    // --- LOGICA DE ESTOQUE ---
-    function salvarProduto() {
-        const id = document.getElementById('edit-id').value;
-        const nome = document.getElementById('p-nome').value.toUpperCase();
-        const tipo = document.getElementById('p-tipo').value;
-        const min = parseInt(document.getElementById('p-min').value) || 0;
-        const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
-        if(!nome) return;
-        if(id) {
-            const idx = produtos.findIndex(p => p.id == id);
-            produtos[idx] = { ...produtos[idx], nome, tipo, min };
-        } else {
-            produtos.push({ id: Date.now(), nome, tipo, min, qtd, emUso: 0 });
-        }
-        salvar(); cancelarEdicao();
-    }
+    // --- LOGICA DE ESTOQUE ---
+    function salvarProduto() {
+        const id = document.getElementById('edit-id').value;
+        const nome = document.getElementById('p-nome').value.toUpperCase();
+        const tipo = document.getElementById('p-tipo').value;
+        const min = parseInt(document.getElementById('p-min').value) || 0;
+        const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
+        if(!nome) return;
+        if(id) {
+            const idx = produtos.findIndex(p => p.id == id);
+            produtos[idx] = { ...produtos[idx], nome, tipo, min };
+        } else {
+            produtos.push({ id: Date.now(), nome, tipo, min, qtd, emUso: 0 });
+        }
+        salvar(); cancelarEdicao();
+    }
 
-    function buscarItemMovimento(v) {
-        const lista = document.getElementById('lista-busca');
-        if (v.length < 1) { lista.classList.add('hidden'); return; }
-        const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(v.toLowerCase()));
-        lista.innerHTML = '';
-        filtrados.forEach(p => {
-            const div = document.createElement('div');
-            div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold text-xs';
-            div.innerHTML = `<span>${p.nome}</span><span class="bg-vinho text-white px-2 py-1 rounded">SALDO: ${p.qtd}</span>`;
-            div.onclick = () => {
-                document.getElementById('m-id-selecionado').value = p.id;
-                document.getElementById('m-busca-item').value = p.nome;
-                lista.classList.add('hidden');
-            };
-            lista.appendChild(div);
-        });
-        lista.classList.remove('hidden');
-    }
+    function buscarItemMovimento(v) {
+        const lista = document.getElementById('lista-busca');
+        if (v.length < 1) { lista.classList.add('hidden'); return; }
+        const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(v.toLowerCase()));
+        lista.innerHTML = '';
+        filtrados.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold text-xs';
+            div.innerHTML = `<span>${p.nome}</span><span class="bg-vinho text-white px-2 py-1 rounded">SALDO: ${p.qtd}</span>`;
+            div.onclick = () => {
+                document.getElementById('m-id-selecionado').value = p.id;
+                document.getElementById('m-busca-item').value = p.nome;
+                lista.classList.add('hidden');
+            };
+            lista.appendChild(div);
+        });
+        lista.classList.remove('hidden');
+    }
 
-    function executarMovimento() {
-        const id = document.getElementById('m-id-selecionado').value;
-        const op = document.getElementById('m-op').value;
-        const qtd = parseInt(document.getElementById('m-qtd').value);
-        const setor = document.getElementById('m-setor').value;
-        const resp = document.getElementById('m-nome').value.toUpperCase();
-        if(!id || !qtd || !resp) return alert("Dados incompletos!");
+    function executarMovimento() {
+        const id = document.getElementById('m-id-selecionado').value;
+        const op = document.getElementById('m-op').value;
+        const qtd = parseInt(document.getElementById('m-qtd').value);
+        const setor = document.getElementById('m-setor').value;
+        const resp = document.getElementById('m-nome').value.toUpperCase();
+        if(!id || !qtd || !resp) return alert("Dados incompletos!");
 
-        const p = produtos.find(item => item.id == id);
-        if(op === 'saida') {
-            if(p.qtd < qtd) return alert("SEM SALDO!");
-            p.qtd -= qtd;
-            if(p.tipo === 'Ferramenta') {
-                pendencias.push({ id: Date.now(), prodId: p.id, prodNome: p.nome, qtd, resp, setor, data: new Date().toLocaleString() });
-            }
-        } else { p.qtd += qtd; }
+        const p = produtos.find(item => item.id == id);
+        if(op === 'saida') {
+            if(p.qtd < qtd) return alert("SEM SALDO!");
+            p.qtd -= qtd;
+            if(p.tipo === 'Ferramenta') {
+                pendencias.push({ id: Date.now(), prodId: p.id, prodNome: p.nome, qtd, resp, setor, data: new Date().toLocaleString() });
+            }
+        } else { p.qtd += qtd; }
 
-        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: op.toUpperCase(), prod: p.nome, prodTipo: p.tipo, qtd, setor: op === 'saida' ? setor : 'ALMOX', resp });
-        salvar(); renderPendencias();
-        document.getElementById('m-busca-item').value = '';
-        document.getElementById('m-qtd').value = '';
-    }
+        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: op.toUpperCase(), prod: p.nome, prodTipo: p.tipo, qtd, setor: op === 'saida' ? setor : 'ALMOX', resp });
+        salvar(); renderPendencias();
+        document.getElementById('m-busca-item').value = '';
+        document.getElementById('m-qtd').value = '';
+    }
 
-    function renderPendencias() {
-        const painel = document.getElementById('painel-pendencias');
-        const lista = document.getElementById('lista-pendencias');
-        if(pendencias.length === 0) { painel.classList.add('hidden'); return; }
-        painel.classList.remove('hidden');
-        lista.innerHTML = pendencias.map(p => `
-            <div class="pendencia-card p-4 rounded-2xl shadow-sm flex flex-col">
-                <h4 class="font-black text-vinho text-xs uppercase">${p.prodNome} (${p.qtd})</h4>
-                <p class="text-[10px] text-gray-500 font-bold">RESP: ${p.resp} | ${p.setor}</p>
-                <button onclick="confirmarDevolucao(${p.id})" class="mt-3 bg-green-600 text-white py-2 rounded-xl text-[9px] font-black uppercase">Confirmar Devolução</button>
-            </div>
-        `).join('');
-    }
+    function renderPendencias() {
+        const painel = document.getElementById('painel-pendencias');
+        const lista = document.getElementById('lista-pendencias');
+        if(pendencias.length === 0) { painel.classList.add('hidden'); return; }
+        painel.classList.remove('hidden');
+        lista.innerHTML = pendencias.map(p => `
+            <div class="pendencia-card p-4 rounded-2xl shadow-sm flex flex-col">
+                <h4 class="font-black text-vinho text-xs uppercase">${p.prodNome} (${p.qtd})</h4>
+                <p class="text-[10px] text-gray-500 font-bold">RESP: ${p.resp} | ${p.setor}</p>
+                <button onclick="confirmarDevolucao(${p.id})" class="mt-3 bg-green-600 text-white py-2 rounded-xl text-[9px] font-black uppercase">Confirmar Devolução</button>
+            </div>
+        `).join('');
+    }
 
-    function confirmarDevolucao(id) {
-        const idx = pendencias.findIndex(x => x.id === id);
-        const pData = pendencias[idx];
-        const produto = produtos.find(x => x.id === pData.prodId);
-        if(produto) produto.qtd += pData.qtd;
-        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: 'DEVOLUÇÃO', prod: pData.prodNome, prodTipo: 'Ferramenta', qtd: pData.qtd, setor: 'ALMOX', resp: pData.resp });
-        pendencias.splice(idx, 1);
-        salvar(); renderPendencias();
-    }
+    function confirmarDevolucao(id) {
+        const idx = pendencias.findIndex(x => x.id === id);
+        const pData = pendencias[idx];
+        const produto = produtos.find(x => x.id === pData.prodId);
+        if(produto) produto.qtd += pData.qtd;
+        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: 'DEVOLUÇÃO', prod: pData.prodNome, prodTipo: 'Ferramenta', qtd: pData.qtd, setor: 'ALMOX', resp: pData.resp });
+        pendencias.splice(idx, 1);
+        salvar(); renderPendencias();
+    }
 
-    // --- ALUGUEIS ---
-    function registrarAluguel() {
-        const item = document.getElementById('aluguel-item').value.toUpperCase();
-        const data = document.getElementById('aluguel-data').value;
-        const fornc = document.getElementById('aluguel-fornecedor').value.toUpperCase();
-        if(!item || !data) return;
-        alugueis.push({ id: Date.now(), item, data, fornc, status: 'ATIVO' });
-        localStorage.setItem('almox_alugueis', JSON.stringify(alugueis));
-        renderAlugueis();
-    }
+    // --- ALUGUEIS ---
+    function registrarAluguel() {
+        const item = document.getElementById('aluguel-item').value.toUpperCase();
+        const data = document.getElementById('aluguel-data').value;
+        const fornc = document.getElementById('aluguel-fornecedor').value.toUpperCase();
+        if(!item || !data) return;
+        alugueis.push({ id: Date.now(), item, data, fornc, status: 'ATIVO' });
+        localStorage.setItem('almox_alugueis', JSON.stringify(alugueis));
+        renderAlugueis();
+    }
 
-    function renderAlugueis() {
-        const cont = document.getElementById('lista-alugueis');
-        cont.innerHTML = alugueis.map(a => `
-            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-l-4 ${a.status === 'ATIVO' ? 'border-amber-500' : 'border-blue-500'}">
-                <div class="text-[9px] font-bold"><span>[${a.status}]</span> ${a.item}<br><span class="text-gray-400">${a.data}</span></div>
-                ${a.status === 'ATIVO' ? `<button onclick="devolverAluguel(${a.id})" class="bg-blue-600 text-white px-2 py-1 rounded text-[8px] font-black">DEVOLVER</button>` : '✓'}
-            </div>
-        `).join('');
-        document.getElementById('dash-aluguel').innerText = alugueis.filter(a => a.status === 'ATIVO').length;
-    }
+    function renderAlugueis() {
+        const cont = document.getElementById('lista-alugueis');
+        cont.innerHTML = alugueis.map(a => `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-l-4 ${a.status === 'ATIVO' ? 'border-amber-500' : 'border-blue-500'}">
+                <div class="text-[9px] font-bold"><span>[${a.status}]</span> ${a.item}<br><span class="text-gray-400">${a.data}</span></div>
+                ${a.status === 'ATIVO' ? `<button onclick="devolverAluguel(${a.id})" class="bg-blue-600 text-white px-2 py-1 rounded text-[8px] font-black">DEVOLVER</button>` : '✓'}
+            </div>
+        `).join('');
+        document.getElementById('dash-aluguel').innerText = alugueis.filter(a => a.status === 'ATIVO').length;
+    }
 
-    function devolverAluguel(id) {
-        const a = alugueis.find(x => x.id === id);
-        a.status = 'DEVOLVIDO';
-        localStorage.setItem('almox_alugueis', JSON.stringify(alugueis));
-        renderAlugueis();
-    }
+    function devolverAluguel(id) {
+        const a = alugueis.find(x => x.id === id);
+        a.status = 'DEVOLVIDO';
+        localStorage.setItem('almox_alugueis', JSON.stringify(alugueis));
+        renderAlugueis();
+    }
 
-    // --- GERAL ---
-    function render() {
-        const busca = document.getElementById('busca-geral').value.toLowerCase();
-        const corpo = document.getElementById('lista-corpo');
-        const histDiv = document.getElementById('historico-lista');
-        corpo.innerHTML = '';
-        let criticos = 0, totalP = 0;
+    // --- GERAL ---
+    function render() {
+        const busca = document.getElementById('busca-geral').value.toLowerCase();
+        const corpo = document.getElementById('lista-corpo');
+        const histDiv = document.getElementById('historico-lista');
+        corpo.innerHTML = '';
+        let criticos = 0, totalP = 0;
 
-        produtos.sort((a,b) => (a.qtd <= a.min ? -1 : 1) || a.nome.localeCompare(b.nome));
-        produtos.forEach(p => {
-            totalP += p.qtd;
-            if(p.nome.toLowerCase().includes(busca)) {
-                let sCls = "bg-green-100 text-green-700", sTxt = "OK";
-                if(p.qtd <= p.min) { sCls = "status-vermelho"; sTxt = "REPOR"; criticos++; }
-                corpo.innerHTML += `<tr class="border-b border-gray-50"><td class="p-4 font-black text-gray-700 text-sm">${p.nome}<br><span class="text-[9px] text-gray-300">MIN: ${p.min}</span></td><td class="p-4 text-center font-black text-xl text-vinho">${p.qtd}</td><td class="p-4 text-center"><span class="text-[9px] px-3 py-1 rounded-lg font-bold ${sCls}">${sTxt}</span></td><td class="p-4 text-right"><button onclick="editarItem(${p.id})" class="text-blue-500 font-black text-[10px]">EDITAR</button></td></tr>`;
-            }
-        });
+        produtos.sort((a,b) => (a.qtd <= a.min ? -1 : 1) || a.nome.localeCompare(b.nome));
+        produtos.forEach(p => {
+            totalP += p.qtd;
+            if(p.nome.toLowerCase().includes(busca)) {
+                let sCls = "bg-green-100 text-green-700", sTxt = "OK";
+                if(p.qtd <= p.min) { sCls = "status-vermelho"; sTxt = "REPOR"; criticos++; }
+                corpo.innerHTML += `<tr class="border-b border-gray-50"><td class="p-4 font-black text-gray-700 text-sm">${p.nome}<br><span class="text-[9px] text-gray-300">MIN: ${p.min}</span></td><td class="p-4 text-center font-black text-xl text-vinho">${p.qtd}</td><td class="p-4 text-center"><span class="text-[9px] px-3 py-1 rounded-lg font-bold ${sCls}">${sTxt}</span></td><td class="p-4 text-right"><button onclick="editarItem(${p.id})" class="text-blue-500 font-black text-[10px]">EDITAR</button></td></tr>`;
+            }
+        });
 
-        document.getElementById('dash-criticos').innerText = criticos;
-        document.getElementById('dash-saidas').innerText = logs.filter(l => l.t > Date.now() - (7*24*60*60*1000)).length;
-        document.getElementById('dash-total').innerText = totalP;
-        histDiv.innerHTML = logs.slice(-6).reverse().map(l => `<div class="text-[9px] bg-gray-50 p-2 rounded-lg border-l-2 ${l.tipo==='SAIDA'?'border-red-500':'border-green-500'} font-bold">${l.tipo}: ${l.prod} (${l.qtd})</div>`).join('');
-    }
+        document.getElementById('dash-criticos').innerText = criticos;
+        document.getElementById('dash-saidas').innerText = logs.filter(l => l.t > Date.now() - (7*24*60*60*1000)).length;
+        document.getElementById('dash-total').innerText = totalP;
+        histDiv.innerHTML = logs.slice(-6).reverse().map(l => `<div class="text-[9px] bg-gray-50 p-2 rounded-lg border-l-2 ${l.tipo==='SAIDA'?'border-red-500':'border-green-500'} font-bold">${l.tipo}: ${l.prod} (${l.qtd})</div>`).join('');
+    }
 
-    function salvar() {
-        localStorage.setItem('almox_final_prods', JSON.stringify(produtos));
-        localStorage.setItem('almox_final_logs', JSON.stringify(logs));
-        localStorage.setItem('almox_pendencias', JSON.stringify(pendencias));
-        render();
-    }
+    function salvar() {
+        localStorage.setItem('almox_final_prods', JSON.stringify(produtos));
+        localStorage.setItem('almox_final_logs', JSON.stringify(logs));
+        localStorage.setItem('almox_pendencias', JSON.stringify(pendencias));
+        render();
+    }
 
-    function editarItem(id) {
-        const p = produtos.find(p => p.id == id);
-        document.getElementById('edit-id').value = p.id;
-        document.getElementById('p-nome').value = p.nome;
-        document.getElementById('p-min').value = p.min;
-        document.getElementById('p-tipo').value = p.tipo;
-        document.getElementById('div-qtd-inicial').classList.add('hidden');
-        document.getElementById('form-title').innerText = "✏️ EDITAR";
-        document.getElementById('btn-cancelar').classList.remove('hidden');
-        window.scrollTo(0,0);
-    }
+    function editarItem(id) {
+        const p = produtos.find(p => p.id == id);
+        document.getElementById('edit-id').value = p.id;
+        document.getElementById('p-nome').value = p.nome;
+        document.getElementById('p-min').value = p.min;
+        document.getElementById('p-tipo').value = p.tipo;
+        document.getElementById('div-qtd-inicial').classList.add('hidden');
+        document.getElementById('form-title').innerText = "✏️ EDITAR";
+        document.getElementById('btn-cancelar').classList.remove('hidden');
+        window.scrollTo(0,0);
+    }
 
-    function cancelarEdicao() {
-        document.getElementById('edit-id').value = "";
-        document.getElementById('div-qtd-inicial').classList.remove('hidden');
-        document.getElementById('form-title').innerText = "📝 GESTÃO";
-        document.getElementById('btn-cancelar').classList.add('hidden');
-    }
+    function cancelarEdicao() {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('div-qtd-inicial').classList.remove('hidden');
+        document.getElementById('form-title').innerText = "📝 GESTÃO";
+        document.getElementById('btn-cancelar').classList.add('hidden');
+    }
 
-    function fazerBackup() {
-        const d = { prods: produtos, logs, setores, alugueis, pendencias };
-        const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `BKP_V92.json`; a.click();
-    }
+    function fazerBackup() {
+        const d = { prods: produtos, logs, setores, alugueis, pendencias };
+        const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `BKP_V92.json`; a.click();
+    }
 
-    function importarBackup(e) {
-        const r = new FileReader();
-        r.onload = (ev) => {
-            const d = JSON.parse(ev.target.result);
-            produtos = d.prods; logs = d.logs; setores = d.setores; alugueis = d.alugueis; pendencias = d.pendencias;
-            salvar(); location.reload();
-        };
-        r.readAsText(e.target.files[0]);
-    }
+    function importarBackup(e) {
+        const r = new FileReader();
+        r.onload = (ev) => {
+            const d = JSON.parse(ev.target.result);
+            produtos = d.prods; logs = d.logs; setores = d.setores; alugueis = d.alugueis; pendencias = d.pendencias;
+            salvar(); location.reload();
+        };
+        r.readAsText(e.target.files[0]);
+    }
 
-    // --- PDF AGRUPADO POR SETOR ---
-    async function gerarRelatorioSetorGrafico() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const dIni = new Date(document.getElementById('filtro-inicio').value + "T00:00:00").getTime();
-        const dFim = new Date(document.getElementById('filtro-fim').value + "T23:59:59").getTime();
-        const logsPeriodo = logs.filter(l => l.t >= dIni && l.t <= dFim);
-        
-        if(logsPeriodo.length === 0) return alert("Sem dados no período!");
+    // --- PDF AGRUPADO POR SETOR ---
+    async function gerarRelatorioSetorGrafico() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const dIni = new Date(document.getElementById('filtro-inicio').value + "T00:00:00").getTime();
+        const dFim = new Date(document.getElementById('filtro-fim').value + "T23:59:59").getTime();
+        const logsPeriodo = logs.filter(l => l.t >= dIni && l.t <= dFim);
+        
+        if(logsPeriodo.length === 0) return alert("Sem dados no período!");
 
-        doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 45, 'F');
-        doc.setTextColor(255); doc.setFontSize(22); doc.text("BALANÇO ANALÍTICO POR SETOR", 15, 25);
-        doc.setFontSize(10); doc.text(`Gerado em: ${new Date().toLocaleString()}`, 15, 35);
+        doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 45, 'F');
+        doc.setTextColor(255); doc.setFontSize(22); doc.text("BALANÇO ANALÍTICO POR SETOR", 15, 25);
+        doc.setFontSize(10); doc.text(`Gerado em: ${new Date().toLocaleString()}`, 15, 35);
 
-        let yPos = 55;
-        // Agrupar logs por Setor
-        const setoresUnicos = [...new Set(logsPeriodo.map(l => l.setor))];
+        let yPos = 55;
+        // Agrupar logs por Setor
+        const setoresUnicos = [...new Set(logsPeriodo.map(l => l.setor))];
 
-        setoresUnicos.forEach(setor => {
-            if (yPos > 250) { doc.addPage(); yPos = 20; }
-            
-            doc.setTextColor(77, 0, 17);
-            doc.setFontSize(14);
-            doc.text(`SETOR: ${setor}`, 15, yPos);
-            yPos += 5;
+        setoresUnicos.forEach(setor => {
+            if (yPos > 250) { doc.addPage(); yPos = 20; }
+            
+            doc.setTextColor(77, 0, 17);
+            doc.setFontSize(14);
+            doc.text(`SETOR: ${setor}`, 15, yPos);
+            yPos += 5;
 
-            const logsSetor = logsPeriodo.filter(l => l.setor === setor);
-            doc.autoTable({
-                startY: yPos,
-                head: [['Data', 'Tipo', 'Produto', 'Qtd', 'Responsável']],
-                body: logsSetor.map(l => [l.data.split(',')[0], l.tipo, l.prod, l.qtd, l.resp]),
-                theme: 'grid',
-                headStyles: { fillColor: [77, 0, 17] },
-                styles: { fontSize: 8 }
-            });
-            yPos = doc.lastAutoTable.finalY + 15;
-        });
+            const logsSetor = logsPeriodo.filter(l => l.setor === setor);
+            doc.autoTable({
+                startY: yPos,
+                head: [['Data', 'Tipo', 'Produto', 'Qtd', 'Responsável']],
+                body: logsSetor.map(l => [l.data.split(',')[0], l.tipo, l.prod, l.qtd, l.resp]),
+                theme: 'grid',
+                headStyles: { fillColor: [77, 0, 17] },
+                styles: { fontSize: 8 }
+            });
+            yPos = doc.lastAutoTable.finalY + 15;
+        });
 
-        doc.save(`Balanço_Setores_V92.pdf`);
-    }
+        doc.save(`Balanço_Setores_V92.pdf`);
+    }
 
-    async function gerarRelatorioAluguel() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFillColor(245, 158, 11); doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255); doc.text("RELATÓRIO DE ALUGUÉIS", 15, 25);
-        doc.autoTable({ startY: 50, head: [['Item', 'Fornecedor', 'Data', 'Status']], body: alugueis.map(a=>[a.item, a.fornc, a.data, a.status]), theme: 'grid' });
-        doc.save(`Alugueis.pdf`);
-    }
+    async function gerarRelatorioAluguel() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFillColor(245, 158, 11); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255); doc.text("RELATÓRIO DE ALUGUÉIS", 15, 25);
+        doc.autoTable({ startY: 50, head: [['Item', 'Fornecedor', 'Data', 'Status']], body: alugueis.map(a=>[a.item, a.fornc, a.data, a.status]), theme: 'grid' });
+        doc.save(`Alugueis.pdf`);
+    }
 
-    document.onkeydown = function(e) {
-        if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
-    };
+    document.onkeydown = function(e) {
+        if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
+    };
 </script>
 </body>
 </html>
