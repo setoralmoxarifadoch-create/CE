@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V8.9 - J. GUILHERME</title>
+    <title>ALMOXARIFADO INTELLIGENT V9.0 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -14,122 +14,112 @@
         .bg-vinho { background-color: var(--vinho); }
         .text-vinho { color: var(--vinho); }
         .status-vermelho { background: #e11d48; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
-        .alerta-piscando { animation: flash-red 0.8s infinite; border: 2px solid #ef4444 !important; background: #fee2e2 !important; }
-        @keyframes flash-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .card-dash { background: white; padding: 15px; border-radius: 16px; border-bottom: 4px solid var(--vinho); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .piscante-alerta { color: #e11d48; font-weight: 900; animation: blink 0.7s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+        .card-dash { background: white; padding: 20px; border-radius: 16px; border-bottom: 4px solid var(--vinho); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; pointer-events: none; }
+        .hidden { display: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
     <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V8.9</h2>
-        <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.0</h2>
+        <p class="text-gray-400 text-xs mb-8 font-bold">Produced by J Guilherme A.C.</p>
         <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho">
-        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase hover:brightness-125 transition">Acessar</button>
+        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
     </div>
 </div>
 
 <div id="app" class="hidden p-4 max-w-7xl mx-auto pb-16">
-    <header class="bg-vinho text-white p-6 rounded-3xl mb-6 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-4">
-        <div>
+    <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
+        <div class="text-center lg:text-left">
             <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
             <p id="clock" class="text-sm font-mono opacity-60"></p>
         </div>
-        <div class="flex gap-2">
-            <button onclick="fazerBackup()" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase">💾 BKP</button>
-            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Relatório PDF</button>
+        <div class="flex flex-wrap items-center bg-white/10 p-3 rounded-2xl gap-3 text-xs">
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black uppercase shadow-lg">📊 Gerar PDF</button>
+            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold uppercase">💾 BKP</button>
         </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Pendências Ativas</p>
-            <h2 id="dash-pendente" class="text-3xl font-black text-red-600">0</h2>
-        </div>
-        <div id="alerta-aluguel" class="card-dash hidden border-amber-500 bg-amber-50">
-            <p class="text-amber-600 text-[10px] font-black uppercase">⚠️ Alugados em Posse</p>
-            <h2 id="dash-alugados" class="text-3xl font-black text-amber-700">0</h2>
+            <p class="text-gray-400 text-[10px] font-black uppercase">Críticos/Repor</p>
+            <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Itens Críticos</p>
-            <h2 id="dash-criticos" class="text-3xl font-black text-orange-600">0</h2>
+            <p class="text-gray-400 text-[10px] font-black uppercase">Com Funcionários</p>
+            <h2 id="dash-pendente" class="text-3xl font-black text-blue-600">0</h2>
         </div>
         <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase">Saldo Total</p>
+            <p class="text-gray-400 text-[10px] font-black uppercase">Saldo Geral</p>
             <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
+        </div>
+        <div class="card-dash border-amber-500">
+            <p class="text-amber-600 text-[10px] font-black uppercase tracking-tighter">⚠️ Itens Alugados</p>
+            <h2 id="dash-alugados" class="text-3xl font-black text-amber-600">0</h2>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div class="lg:col-span-4 space-y-6">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Novo Item/Ferramenta</h3>
-                <input type="hidden" id="edit-id">
-                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none uppercase font-bold text-sm">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border">
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Cadastrar Material</h3>
+                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none uppercase font-bold text-xs">
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
                         <option value="Insumo">Insumo (📦)</option>
                         <option value="Ferramenta">Ferramenta (🛠️)</option>
                     </select>
-                    <input type="number" id="p-min" placeholder="Aviso Mínimo" class="border p-3 rounded-xl text-center text-xs">
+                    <input type="number" id="p-min" placeholder="Min" class="border p-3 rounded-xl text-center text-xs font-bold">
                 </div>
-                <div id="div-qtd-inicial" class="mb-3">
-                    <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-lg">
+                <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-lg mb-3">
+                <button onclick="salvarProduto()" class="w-full bg-vinho text-white p-3 rounded-2xl font-black uppercase text-xs">Adicionar ao Estoque</button>
+                
+                <div class="mt-6 pt-6 border-t border-dashed">
+                    <h3 class="font-black text-amber-700 mb-2 text-[10px] uppercase italic">Aluguel / Locação</h3>
+                    <input type="text" id="alu-nome" placeholder="ITEM ALUGADO" class="w-full border p-2 rounded-lg mb-2 text-[10px] uppercase">
+                    <input type="text" id="alu-empresa" placeholder="LOCADORA" class="w-full border p-2 rounded-lg mb-2 text-[10px] uppercase">
+                    <button onclick="salvarAluguel()" class="w-full bg-amber-600 text-white p-2 rounded-xl font-black text-[10px] uppercase">Registrar Aluguel</button>
                 </div>
-                <button onclick="salvarProduto()" class="w-full bg-vinho text-white p-3 rounded-2xl font-black uppercase text-xs">Salvar No Estoque</button>
-            </div>
-
-            <div class="bg-amber-50 p-6 rounded-3xl shadow-sm border border-amber-200">
-                <h3 class="font-black text-amber-800 mb-4 text-xs uppercase italic">🤝 Registrar Aluguel</h3>
-                <input type="text" id="alu-nome" placeholder="NOME DO ITEM ALUGADO" class="w-full border p-2 rounded-lg mb-2 text-xs uppercase font-bold">
-                <input type="text" id="alu-empresa" placeholder="EMPRESA LOCADORA" class="w-full border p-2 rounded-lg mb-2 text-xs uppercase font-bold">
-                <input type="date" id="alu-data" class="w-full border p-2 rounded-lg mb-2 text-xs">
-                <button onclick="salvarAluguel()" class="w-full bg-amber-600 text-white p-2 rounded-xl font-black uppercase text-[10px]">Cadastrar Aluguel</button>
             </div>
 
             <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Saída de Material</h3>
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Registrar Saída</h3>
                 <div class="relative">
                     <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR MATERIAL..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3">
                     <div id="lista-busca" class="search-results hidden"></div>
                 </div>
                 <input type="hidden" id="m-id-selecionado">
                 <div class="grid grid-cols-2 gap-2 mb-3">
-                    <select id="m-op" class="border p-3 rounded-xl font-bold bg-gray-50 text-xs uppercase"><option value="saida">Retirar</option><option value="entrada">Devolver/Entrar</option></select>
-                    <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl">
+                    <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl text-vinho">
+                    <select id="m-setor" class="border p-3 rounded-xl bg-gray-50 text-[10px] font-bold uppercase">
+                        <option>MONTAGEM</option><option>Setor 1</option><option>Setor 2</option><option>Pintura</option>
+                    </select>
                 </div>
-                <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
-                <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold uppercase">
-                    <option>MONTAGEM</option><option>Setor 1</option><option>Setor 2</option><option>Limpeza</option><option>Marcenaria</option><option>Pintura</option><option>Solda</option>
-                </select>
-                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Movimento</button>
+                <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-4 uppercase text-xs font-bold">
+                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg">Confirmar Saída</button>
             </div>
         </div>
 
         <div class="lg:col-span-8 space-y-6">
-            <div id="container-pendentes" class="hidden bg-red-50 p-4 rounded-3xl border-2 border-red-200">
-                <h3 class="text-red-700 font-black text-xs uppercase mb-3 flex items-center">🚨 Ferramentas com Funcionários:</h3>
-                <div id="lista-pendentes" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            <div id="area-alugados" class="hidden bg-amber-50 p-4 rounded-3xl border border-amber-200">
+                <p class="text-amber-800 font-black text-[10px] uppercase mb-2">📦 Itens Alugados Ativos:</p>
+                <div id="lista-alugados" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[10px]"></div>
             </div>
 
-            <div id="container-alugados" class="hidden bg-amber-50 p-4 rounded-3xl border-2 border-amber-200">
-                <h3 class="text-amber-800 font-black text-xs uppercase mb-3">📦 Itens Alugados (Em nossa posse):</h3>
-                <div id="lista-alugados-cards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-            </div>
-
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                    <h3 class="font-black text-vinho text-xs uppercase">Estoque Geral</h3>
-                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 Pesquisar..." class="border p-2 rounded-xl text-xs outline-none w-1/2">
+            <div class="bg-white rounded-3xl shadow-sm border overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b">
+                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 Pesquisar no almoxarifado..." class="w-full p-3 rounded-xl border border-gray-200 outline-none text-xs font-bold">
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
+                    <table class="w-full text-left">
                         <thead>
-                            <tr class="text-gray-400 uppercase font-black border-b">
+                            <tr class="text-[10px] uppercase text-gray-400 font-black border-b">
                                 <th class="p-4">Material</th>
                                 <th class="p-4 text-center">Saldo</th>
                                 <th class="p-4 text-center">Status</th>
@@ -144,16 +134,14 @@
     </div>
 </div>
 
-<div class="signature">Produced by J Guilherme A.C.</div>
-
-<div style="position: absolute; left: -9999px;"><canvas id="canvasSetor" width="300" height="300"></canvas></div>
+<div class="signature italic">Produced by J Guilherme A.C.</div>
 
 <script>
     const PIN = "0000"; 
     let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
     let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
     let alugados = JSON.parse(localStorage.getItem('almox_final_alugados')) || [];
-    let pendentes = JSON.parse(localStorage.getItem('almox_final_pendentes')) || [];
+    let posse = JSON.parse(localStorage.getItem('almox_final_posse')) || [];
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
 
@@ -162,22 +150,16 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             render();
-        } else { alert("ACESSO NEGADO"); }
+        } else { alert("PIN INCORRETO!"); }
     }
 
     function salvarProduto() {
-        const id = document.getElementById('edit-id').value;
         const nome = document.getElementById('p-nome').value.toUpperCase();
         const tipo = document.getElementById('p-tipo').value;
         const min = parseInt(document.getElementById('p-min').value) || 0;
         const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
         if(!nome) return;
-        if(id) {
-            const idx = produtos.findIndex(p => p.id == id);
-            produtos[idx] = { ...produtos[idx], nome, tipo, min };
-        } else {
-            produtos.push({ id: Date.now(), nome, tipo, min, qtd });
-        }
+        produtos.push({ id: Date.now(), nome, tipo, min, qtd });
         salvar();
         document.getElementById('p-nome').value = '';
         document.getElementById('p-qtd').value = '';
@@ -186,19 +168,11 @@
     function salvarAluguel() {
         const nome = document.getElementById('alu-nome').value.toUpperCase();
         const empresa = document.getElementById('alu-empresa').value.toUpperCase();
-        const data = document.getElementById('alu-data').value;
         if(!nome || !empresa) return;
-        alugados.push({ id: Date.now(), nome, empresa, data });
-        localStorage.setItem('almox_final_alugados', JSON.stringify(alugados));
-        render();
+        alugados.push({ id: Date.now(), nome, empresa, data: new Date().toLocaleDateString() });
+        salvar();
         document.getElementById('alu-nome').value = '';
         document.getElementById('alu-empresa').value = '';
-    }
-
-    function removerAluguel(id) {
-        alugados = alugados.filter(a => a.id !== id);
-        localStorage.setItem('almox_final_alugados', JSON.stringify(alugados));
-        render();
     }
 
     function buscarItemMovimento(v) {
@@ -207,10 +181,9 @@
         const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(v.toLowerCase()));
         lista.innerHTML = '';
         filtrados.forEach(p => {
-            const ico = p.tipo === 'Ferramenta' ? '🛠️' : '📦';
             const div = document.createElement('div');
-            div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold text-sm';
-            div.innerHTML = `<span>${ico} ${p.nome}</span><span class="bg-vinho text-white px-2 py-1 rounded text-[10px]">SALDO: ${p.qtd}</span>`;
+            div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold text-xs';
+            div.innerHTML = `<span>${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</span> <span class="text-vinho">QTD: ${p.qtd}</span>`;
             div.onclick = () => {
                 document.getElementById('m-id-selecionado').value = p.id;
                 document.getElementById('m-busca-item').value = p.nome;
@@ -223,117 +196,104 @@
 
     function executarMovimento() {
         const id = document.getElementById('m-id-selecionado').value;
-        const op = document.getElementById('m-op').value;
         const qtd = parseInt(document.getElementById('m-qtd').value);
+        const func = document.getElementById('m-nome').value.toUpperCase();
         const setor = document.getElementById('m-setor').value;
-        const resp = document.getElementById('m-nome').value.toUpperCase();
-        if(!id || !qtd || !resp) return alert("Preencha Nome e Qtd!");
+        if(!id || !qtd || !func) return alert("Preencha todos os campos!");
         
         const p = produtos.find(item => item.id == id);
-        if(op === 'saida') {
-            if(p.qtd < qtd) return alert("SEM SALDO!");
-            p.qtd -= qtd;
-            // Se for ferramenta, entra nas pendências piscando
-            if(p.tipo === 'Ferramenta') {
-                pendentes.push({ idMov: Date.now(), idProd: p.id, nome: p.nome, func: resp, qtd: qtd, data: new Date().toLocaleString() });
-            }
-        } else { p.qtd += qtd; }
+        if(p.qtd < qtd) return alert("SALDO INSUFICIENTE!");
         
-        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: op.toUpperCase(), prod: p.nome, qtd, setor, resp });
+        p.qtd -= qtd;
+        if(p.tipo === 'Ferramenta') {
+            posse.push({ idPosse: Date.now(), idProd: p.id, nome: p.nome, func: func, qtd: qtd });
+        }
+        
+        logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: 'SAÍDA', prod: p.nome, qtd, setor, resp: func });
         salvar();
         document.getElementById('m-busca-item').value = '';
         document.getElementById('m-qtd').value = '';
         document.getElementById('m-nome').value = '';
     }
 
-    function devolverPendente(idMov) {
-        const item = pendentes.find(p => p.idMov === idMov);
+    function devolver(idPosse) {
+        const item = posse.find(p => p.idPosse === idPosse);
         const prod = produtos.find(p => p.id === item.idProd);
         if(prod) prod.qtd += item.qtd;
-        pendentes = pendentes.filter(p => p.idMov !== idMov);
+        posse = posse.filter(p => p.idPosse !== idPosse);
         logs.push({ t: Date.now(), data: new Date().toLocaleString(), tipo: 'DEVOLUÇÃO', prod: item.nome, qtd: item.qtd, setor: 'ALMOX', resp: item.func });
         salvar();
     }
 
     function render() {
-        const busca = document.getElementById('busca-geral').value.toLowerCase();
         const corpo = document.getElementById('lista-corpo');
-        const listaP = document.getElementById('lista-pendentes');
-        const listaA = document.getElementById('lista-alugados-cards');
+        const busca = document.getElementById('busca-geral').value.toLowerCase();
+        const areaA = document.getElementById('lista-alugados');
         
-        // PENDENTES (PISCANDO)
-        if(pendentes.length > 0) {
-            document.getElementById('container-pendentes').classList.remove('hidden');
-            listaP.innerHTML = pendentes.map(p => `
-                <div class="alerta-piscando p-3 rounded-2xl flex justify-between items-center shadow-sm">
-                    <div>
-                        <p class="text-[10px] font-black text-red-600 uppercase">🛠️ EM POSSE DE: ${p.func}</p>
-                        <p class="text-xs font-bold text-gray-800">${p.nome} (${p.qtd} un)</p>
-                    </div>
-                    <button onclick="devolverPendente(${p.idMov})" class="bg-green-600 text-white px-3 py-2 rounded-xl font-bold text-[10px]">DEVOLVER ✅</button>
-                </div>
-            `).join('');
-        } else { document.getElementById('container-pendentes').classList.add('hidden'); }
-
-        // ALUGADOS
+        // Renderizar Alugados
         if(alugados.length > 0) {
-            document.getElementById('container-alugados').classList.remove('hidden');
-            document.getElementById('alerta-aluguel').classList.remove('hidden');
-            document.getElementById('dash-alugados').innerText = alugados.length;
-            listaA.innerHTML = alugados.map(a => `
-                <div class="bg-white p-3 rounded-2xl border border-amber-200 flex justify-between items-center">
-                    <div>
-                        <p class="text-[9px] font-black text-amber-600 uppercase">🏢 ${a.empresa}</p>
-                        <p class="text-xs font-bold">${a.nome}</p>
-                        <p class="text-[9px] text-gray-400">Desde: ${a.data}</p>
-                    </div>
-                    <button onclick="removerAluguel(${a.id})" class="text-red-500 font-bold text-[9px] uppercase">Encerrar</button>
+            document.getElementById('area-alugados').classList.remove('hidden');
+            areaA.innerHTML = alugados.map(a => `
+                <div class="bg-white p-2 border rounded-lg flex justify-between items-center">
+                    <span><strong>${a.nome}</strong> (${a.empresa})</span>
+                    <button onclick="alugados = alugados.filter(x=>x.id != ${a.id}); salvar();" class="text-red-500 font-black">X</button>
                 </div>
             `).join('');
-        } else { 
-            document.getElementById('container-alugados').classList.add('hidden'); 
-            document.getElementById('alerta-aluguel').classList.add('hidden');
-        }
+        } else { document.getElementById('area-alugados').classList.add('hidden'); }
 
-        // ESTOQUE
+        // Renderizar Estoque
         corpo.innerHTML = '';
         let criticos = 0, total = 0;
         produtos.sort((a,b) => (a.qtd <= a.min ? -1 : 1)).forEach(p => {
             if(p.nome.toLowerCase().includes(busca)) {
                 total += p.qtd;
-                let sCls = "bg-green-100 text-green-700", sTxt = "OK";
-                if(p.qtd <= p.min) { sCls = "status-vermelho"; sTxt = "REPOR"; criticos++; }
+                let status = p.qtd <= p.min ? '<span class="status-vermelho text-[9px]">REPOR</span>' : '<span class="bg-green-100 text-green-700 text-[9px] px-2 py-1 rounded">OK</span>';
+                if(p.qtd <= p.min) criticos++;
+                
+                // Buscar se alguém está com este item
+                const quemEsta = posse.filter(item => item.idProd === p.id);
+                let listaQuem = quemEsta.map(q => `
+                    <div class="piscante-alerta text-[10px] mt-1 flex justify-between items-center bg-red-50 p-1 rounded">
+                        <span>⚠️ ${q.func} está com ${q.qtd} un.</span>
+                        <button onclick="devolver(${q.idPosse})" class="bg-vinho text-white px-2 py-1 rounded text-[8px] font-black">MARCAR DEVOLUÇÃO ✅</button>
+                    </div>
+                `).join('');
+
                 corpo.innerHTML += `
-                    <tr class="border-b border-gray-50">
-                        <td class="p-4 font-bold text-gray-700">${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</td>
-                        <td class="p-4 text-center font-black text-lg">${p.qtd}</td>
-                        <td class="p-4 text-center"><span class="${sCls} text-[9px] px-2 py-1 rounded">${sTxt}</span></td>
-                        <td class="p-4 text-right"><button onclick="editarItem(${p.id})" class="text-blue-500 font-bold">EDITAR</button></td>
+                    <tr class="border-b border-gray-100">
+                        <td class="p-4">
+                            <div class="font-black text-gray-700 text-sm">${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</div>
+                            ${listaQuem}
+                        </td>
+                        <td class="p-4 text-center font-black text-lg text-vinho">${p.qtd}</td>
+                        <td class="p-4 text-center">${status}</td>
+                        <td class="p-4 text-right"><button onclick="produtos = produtos.filter(x=>x.id != ${p.id}); salvar();" class="text-gray-300 hover:text-red-500">Excluir</button></td>
                     </tr>`;
             }
         });
-        document.getElementById('dash-pendente').innerText = pendentes.length;
+
         document.getElementById('dash-criticos').innerText = criticos;
+        document.getElementById('dash-pendente').innerText = posse.length;
         document.getElementById('dash-total').innerText = total;
+        document.getElementById('dash-alugados').innerText = alugados.length;
     }
 
     function salvar() {
         localStorage.setItem('almox_final_prods', JSON.stringify(produtos));
         localStorage.setItem('almox_final_logs', JSON.stringify(logs));
-        localStorage.setItem('almox_final_pendentes', JSON.stringify(pendentes));
+        localStorage.setItem('almox_final_alugados', JSON.stringify(alugados));
+        localStorage.setItem('almox_final_posse', JSON.stringify(posse));
         render();
     }
 
     function fazerBackup() {
-        const d = { prods: produtos, logs: logs, alu: alugados, pen: pendentes };
-        const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
+        const data = { prods: produtos, logs: logs, alu: alugados, pos: posse };
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `ALMOX_V89_${new Date().toLocaleDateString()}.json`;
+        a.download = `ALMOX_MASTER_V9.json`;
         a.click();
     }
-
-    // PDF e outras funções mantidas das versões anteriores...
 </script>
 </body>
 </html>
