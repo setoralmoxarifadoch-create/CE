@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V9.2 - J. GUILHERME</title>
+    <title>ALMOXARIFADO INTELLIGENT V9.3 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -26,36 +26,49 @@
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
     <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.2</h2>
-        <p class="text-gray-400 text-xs mb-8 font-bold">Produced by J Guilherme A.C.</p>
-        <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho">
-        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase hover:brightness-125 transition">Acessar</button>
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.3</h2>
+        <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
+        <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
+        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
     </div>
 </div>
 
 <div id="app" class="hidden p-4 max-w-7xl mx-auto pb-16">
     <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
-        <div>
+        <div class="text-center lg:text-left">
             <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
             <p id="clock" class="text-sm font-mono opacity-60"></p>
         </div>
         <div class="flex gap-2">
-            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-xs uppercase">💾 BKP</button>
-            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-xs uppercase shadow-lg">📊 PDF</button>
+            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-xs uppercase shadow-md">💾 Backup</button>
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-xs uppercase shadow-lg hover:bg-gray-100 transition">📊 PDF</button>
         </div>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Aviso de Reposição</p><h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2></div>
-        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Pendentes Devolução</p><h2 id="dash-pendente" class="text-3xl font-black text-blue-600">0</h2></div>
-        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Total de Itens</p><h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2></div>
-        <div class="card-dash border-amber-500"><p class="text-amber-600 text-[10px] font-black uppercase">Itens Alugados</p><h2 id="dash-alugados" class="text-3xl font-black text-amber-600">0</h2></div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase">Aviso de Reposição</p>
+            <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
+        </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase">Pendentes Devolução</p>
+            <h2 id="dash-pendente" class="text-3xl font-black text-blue-600">0</h2>
+        </div>
+        <div class="card-dash">
+            <p class="text-gray-400 text-[10px] font-black uppercase">Total de Itens</p>
+            <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
+        </div>
+        <div class="card-dash border-amber-500">
+            <p class="text-amber-600 text-[10px] font-black uppercase">Itens Alugados</p>
+            <h2 id="dash-alugados" class="text-3xl font-black text-amber-600">0</h2>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div class="lg:col-span-4 space-y-6">
             <div class="bg-white p-6 rounded-3xl shadow-sm border">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Cadastrar Material</h3>
+                <h3 id="form-title" class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Cadastrar Material</h3>
+                <input type="hidden" id="edit-id">
                 <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none uppercase font-bold text-xs">
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
@@ -64,14 +77,19 @@
                     </select>
                     <input type="number" id="p-min" placeholder="Min" class="border p-3 rounded-xl text-center text-xs font-bold">
                 </div>
-                <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-lg mb-4">
-                <button onclick="salvarProduto()" class="w-full bg-vinho text-white p-3 rounded-2xl font-black uppercase text-xs mb-4">Salvar Item</button>
+                <div id="div-qtd-inicial" class="mb-4">
+                    <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-lg">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho text-white p-3 rounded-2xl font-black uppercase text-xs">Salvar</button>
+                    <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-200 text-gray-600 px-4 rounded-2xl font-black text-xs">X</button>
+                </div>
                 
-                <div class="pt-4 border-t border-dashed">
-                    <h3 class="font-black text-amber-700 mb-2 text-[10px] uppercase italic">Registrar Locação (Aluguel)</h3>
-                    <input type="text" id="alu-nome" placeholder="O QUE FOI ALUGADO?" class="w-full border p-2 rounded-lg mb-2 text-[10px] uppercase">
-                    <input type="text" id="alu-empresa" placeholder="QUAL A EMPRESA?" class="w-full border p-2 rounded-lg mb-2 text-[10px] uppercase">
-                    <button onclick="salvarAluguel()" class="w-full bg-amber-600 text-white p-2 rounded-xl font-black text-[10px] uppercase">Cadastrar Aluguel</button>
+                <div class="mt-6 pt-6 border-t border-dashed">
+                    <h3 class="font-black text-amber-700 mb-2 text-[10px] uppercase italic">Locação (Aluguel)</h3>
+                    <input type="text" id="alu-nome" placeholder="ITEM ALUGADO" class="w-full border p-2 rounded-lg mb-2 text-[10px] uppercase">
+                    <input type="text" id="alu-empresa" placeholder="EMPRESA" class="w-full border p-2 rounded-lg mb-2 text-[10px] uppercase">
+                    <button onclick="salvarAluguel()" class="w-full bg-amber-600 text-white p-2 rounded-xl font-black text-[10px] uppercase">Registrar</button>
                 </div>
             </div>
 
@@ -89,31 +107,24 @@
                         <option>SHOWROOM</option>
                         <option>LIMPEZA EXTERNA</option>
                         <option>MANUTENÇÃO EXTERNA</option>
-                        <option>Setor 1</option>
-                        <option>Setor 2</option>
-                        <option>Limpeza de Estofados</option>
-                        <option>Futtons</option>
-                        <option>Pintura</option>
-                        <option>Marcenaria</option>
-                        <option>Reparo</option>
-                        <option>Forração</option>
-                        <option>Solda</option>
-                        <option>Escritório</option>
+                        <option>Setor 1</option><option>Setor 2</option><option>Limpeza de Estofados</option>
+                        <option>Futtons</option><option>Pintura</option><option>Marcenaria</option>
+                        <option>Reparo</option><option>Forração</option><option>Solda</option><option>Escritório</option>
                     </select>
                 </div>
                 <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-4 uppercase text-xs font-bold">
-                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg">Confirmar Registro</button>
+                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition">Confirmar Saída</button>
             </div>
         </div>
 
         <div class="lg:col-span-8 space-y-6">
-            <div id="area-alugados" class="hidden bg-amber-50 p-4 rounded-3xl border border-amber-200">
-                <p class="text-amber-800 font-black text-[10px] uppercase mb-2">📦 Itens Alugados / Em nossa posse:</p>
+            <div id="area-alugados" class="hidden bg-amber-50 p-4 rounded-3xl border border-amber-200 shadow-sm">
+                <p class="text-amber-800 font-black text-[10px] uppercase mb-2">📦 Itens Alugados Ativos:</p>
                 <div id="lista-alugados" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[10px]"></div>
             </div>
 
             <div class="bg-white rounded-3xl shadow-sm border overflow-hidden">
-                <div class="p-4 bg-gray-50 border-b">
+                <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
                     <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 Pesquisar estoque..." class="w-full p-3 rounded-xl border border-gray-200 outline-none text-xs font-bold uppercase">
                 </div>
                 <div class="overflow-x-auto">
@@ -154,15 +165,46 @@
     }
 
     function salvarProduto() {
+        const id = document.getElementById('edit-id').value;
         const nome = document.getElementById('p-nome').value.toUpperCase();
         const tipo = document.getElementById('p-tipo').value;
         const min = parseInt(document.getElementById('p-min').value) || 0;
         const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
+        
         if(!nome) return;
-        produtos.push({ id: Date.now(), nome, tipo, min, qtd });
+
+        if(id) {
+            const idx = produtos.findIndex(p => p.id == id);
+            produtos[idx] = { ...produtos[idx], nome, tipo, min };
+            cancelarEdicao();
+        } else {
+            produtos.push({ id: Date.now(), nome, tipo, min, qtd });
+        }
+        
         salvar();
         document.getElementById('p-nome').value = '';
         document.getElementById('p-qtd').value = '';
+        document.getElementById('p-min').value = '';
+    }
+
+    function editarItem(id) {
+        const p = produtos.find(p => p.id == id);
+        document.getElementById('edit-id').value = p.id;
+        document.getElementById('p-nome').value = p.nome;
+        document.getElementById('p-tipo').value = p.tipo;
+        document.getElementById('p-min').value = p.min;
+        document.getElementById('div-qtd-inicial').classList.add('hidden');
+        document.getElementById('form-title').innerText = "✏️ Editar Material";
+        document.getElementById('btn-cancelar').classList.remove('hidden');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function cancelarEdicao() {
+        document.getElementById('edit-id').value = "";
+        document.getElementById('p-nome').value = "";
+        document.getElementById('div-qtd-inicial').classList.remove('hidden');
+        document.getElementById('form-title').innerText = "📝 Cadastrar Material";
+        document.getElementById('btn-cancelar').classList.add('hidden');
     }
 
     function salvarAluguel() {
@@ -183,7 +225,7 @@
         filtrados.forEach(p => {
             const div = document.createElement('div');
             div.className = 'p-4 hover:bg-gray-50 cursor-pointer border-b flex justify-between items-center font-bold text-xs';
-            div.innerHTML = `<span>${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</span> <span class="bg-vinho text-white px-2 py-1 rounded">ESTOQUE: ${p.qtd}</span>`;
+            div.innerHTML = `<span>${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</span> <span class="bg-vinho text-white px-2 py-1 rounded">SALDO: ${p.qtd}</span>`;
             div.onclick = () => {
                 document.getElementById('m-id-selecionado').value = p.id;
                 document.getElementById('m-busca-item').value = p.nome;
@@ -199,7 +241,7 @@
         const qtd = parseInt(document.getElementById('m-qtd').value);
         const func = document.getElementById('m-nome').value.toUpperCase();
         const setor = document.getElementById('m-setor').value;
-        if(!id || !qtd || !func) return alert("Falta preencher dados!");
+        if(!id || !qtd || !func) return alert("Preencha todos os dados!");
         const p = produtos.find(item => item.id == id);
         if(p.qtd < qtd) return alert("SALDO INSUFICIENTE!");
         p.qtd -= qtd;
@@ -223,11 +265,17 @@
     function render() {
         const corpo = document.getElementById('lista-corpo');
         const busca = document.getElementById('busca-geral').value.toLowerCase();
-        const areaA = document.getElementById('lista-alugados');
+        
         if(alugados.length > 0) {
             document.getElementById('area-alugados').classList.remove('hidden');
-            areaA.innerHTML = alugados.map(a => `<div class="bg-white p-2 border border-amber-200 rounded-lg flex justify-between items-center"><span><strong>${a.nome}</strong> (${a.empresa})</span><button onclick="alugados = alugados.filter(x=>x.id != ${a.id}); salvar();" class="text-red-500 font-black px-2">X</button></div>`).join('');
+            document.getElementById('lista-alugados').innerHTML = alugados.map(a => `
+                <div class="bg-white p-2 border border-amber-200 rounded-lg flex justify-between items-center shadow-sm">
+                    <span><strong>${a.nome}</strong> (${a.empresa})</span>
+                    <button onclick="alugados = alugados.filter(x=>x.id != ${a.id}); salvar();" class="text-red-500 font-black px-2">X</button>
+                </div>
+            `).join('');
         } else { document.getElementById('area-alugados').classList.add('hidden'); }
+
         corpo.innerHTML = '';
         let criticos = 0, total = 0;
         produtos.sort((a,b) => (a.qtd <= a.min ? -1 : 1)).forEach(p => {
@@ -235,11 +283,31 @@
                 total += p.qtd;
                 let status = p.qtd <= p.min ? '<span class="status-vermelho text-[9px]">REPOR</span>' : '<span class="bg-green-100 text-green-700 text-[9px] px-2 py-1 rounded">ESTOQUE OK</span>';
                 if(p.qtd <= p.min) criticos++;
+                
                 const quemEsta = posse.filter(item => item.idProd === p.id);
-                let listaQuem = quemEsta.map(q => `<div class="piscante-alerta text-[10px] mt-2 flex justify-between items-center bg-red-50 p-2 rounded-lg border border-red-100"><span>⚠️ EM POSSE DE: ${q.func} (${q.qtd} un.)</span><button onclick="devolver(${q.idPosse})" class="bg-vinho text-white px-3 py-1 rounded-md text-[8px] font-black uppercase">Devolveu ✅</button></div>`).join('');
-                corpo.innerHTML += `<tr class="border-b border-gray-100"><td class="p-4"><div class="font-black text-gray-700 text-sm">${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</div>${listaQuem}</td><td class="p-4 text-center font-black text-xl text-vinho">${p.qtd}</td><td class="p-4 text-center">${status}</td><td class="p-4 text-right"><button onclick="produtos = produtos.filter(x=>x.id != ${p.id}); salvar();" class="text-gray-300 hover:text-red-500 text-[10px] font-bold">EXCLUIR</button></td></tr>`;
+                let listaQuem = quemEsta.map(q => `
+                    <div class="piscante-alerta text-[10px] mt-2 flex justify-between items-center bg-red-50 p-2 rounded-lg border border-red-100">
+                        <span>⚠️ EM POSSE DE: ${q.func} (${q.qtd} un.)</span>
+                        <button onclick="devolver(${q.idPosse})" class="bg-vinho text-white px-3 py-1 rounded-md text-[8px] font-black uppercase">Devolveu ✅</button>
+                    </div>
+                `).join('');
+
+                corpo.innerHTML += `
+                    <tr class="border-b border-gray-100">
+                        <td class="p-4">
+                            <div class="font-black text-gray-700 text-sm">${p.tipo === 'Ferramenta' ? '🛠️' : '📦'} ${p.nome}</div>
+                            ${listaQuem}
+                        </td>
+                        <td class="p-4 text-center font-black text-xl text-vinho">${p.qtd}</td>
+                        <td class="p-4 text-center">${status}</td>
+                        <td class="p-4 text-right flex gap-3 justify-end items-center">
+                            <button onclick="editarItem(${p.id})" class="text-blue-600 font-bold text-[10px] hover:underline">EDITAR</button>
+                            <button onclick="if(confirm('Excluir item?')){produtos = produtos.filter(x=>x.id != ${p.id}); salvar();}" class="text-gray-300 hover:text-red-500 text-[10px] font-bold">EXCLUIR</button>
+                        </td>
+                    </tr>`;
             }
         });
+
         document.getElementById('dash-criticos').innerText = criticos;
         document.getElementById('dash-pendente').innerText = posse.length;
         document.getElementById('dash-total').innerText = total;
@@ -259,7 +327,7 @@
         const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `ALMOX_JGUILHERME_V92.json`;
+        a.download = `ALMOX_JGUILHERME_V93.json`;
         a.click();
     }
 </script>
