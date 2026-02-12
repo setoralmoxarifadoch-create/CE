@@ -1,325 +1,109 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V9.5 - J. GUILHERME</title>
+async function gerarRelatorioSetorGrafico() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const dIni = new Date(document.getElementById('filtro-inicio').value + "T00:00:00").getTime();
+    const dFim = new Date(document.getElementById('filtro-fim').value + "T23:59:59").getTime();
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        :root { --vinho: #4d0011; --vinho-claro: #851e36; }
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-user-select: none; user-select: none; }
-        .bg-vinho { background-color: var(--vinho); }
-        .text-vinho { color: var(--vinho); }
-        .status-vermelho { background: #e11d48; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .card-dash { background: white; padding: 20px; border-radius: 16px; border-bottom: 4px solid var(--vinho); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        .search-results { position: absolute; z-index: 100; width: 100%; background: white; border: 1px solid #ddd; max-height: 250px; overflow-y: auto; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
-        .hidden { display: none; }
-        .pendencia-card { border-left: 4px solid #e11d48; background: #fff1f2; }
-    </style>
-</head>
-<body oncontextmenu="return false;">
-
-<div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
-    <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V9.5</h2>
-        <p class="text-gray-400 text-xs mb-8 font-bold text-center">Produced by J Guilherme A.C.</p>
-        <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho transition-all">
-        <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-125 transition">Acessar Sistema</button>
-    </div>
-</div>
-
-<div id="app" class="hidden p-4 max-w-7xl mx-auto pb-16">
+    // Filtra logs
+    const logsPeriodo = logs.filter(l => l.t >= dIni && l.t <= dFim && l.tipo === 'SAIDA'); // Apenas saídas contam como consumo
     
-    <header class="bg-vinho text-white p-6 rounded-3xl mb-8 flex flex-col lg:flex-row justify-between items-center shadow-2xl gap-6">
-        <div class="flex items-center gap-4 text-center lg:text-left w-full lg:w-auto justify-center lg:justify-start">
-            <div class="relative group" title="Clique para alterar a logo">
-                <img id="img-logo" src="https://via.placeholder.com/150?text=LOGO" 
-                     class="w-16 h-16 object-contain bg-white rounded-xl cursor-pointer hover:opacity-80 transition shadow-lg border-2 border-white/20"
-                     onclick="document.getElementById('input-logo').click()">
-                <input type="file" id="input-logo" class="hidden" accept="image/*" onchange="salvarLogo(event)">
-            </div>
-            
-            <div>
-                <h1 class="text-2xl font-black tracking-tighter uppercase italic">Almoxarifado Intelligence</h1>
-                <p id="clock" class="text-sm font-mono opacity-60"></p>
-            </div>
-        </div>
-        
-        <div class="flex flex-wrap items-center justify-center bg-white/10 p-3 rounded-2xl gap-3">
-            <div class="text-[10px] font-bold uppercase">Relatórios:</div>
-            <input type="date" id="filtro-inicio" class="text-black text-xs p-1 rounded font-bold cursor-pointer">
-            <input type="date" id="filtro-fim" class="text-black text-xs p-1 rounded font-bold cursor-pointer">
-            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg hover:scale-105 transition">📊 Gráficos PDF</button>
-            <button onclick="gerarRelatorioAluguel()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg hover:scale-105 transition">🤝 Aluguéis PDF</button>
-        </div>
+    if(logsPeriodo.length === 0) return alert("Sem dados de SAÍDA no período para gerar gráficos!");
 
-        <div class="flex gap-2">
-            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase hover:bg-blue-700">💾 BKP</button>
-            <button onclick="document.getElementById('import-f').click()" class="bg-gray-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase italic hover:bg-gray-600">Restaurar</button>
-            <input type="file" id="import-f" onchange="importarBackup(event)" class="hidden">
-        </div>
-    </header>
+    // --- CÁLCULOS PARA O GRÁFICO ---
+    // 1. Agrupar por Setor
+    const dadosSetor = {};
+    logsPeriodo.forEach(l => {
+        dadosSetor[l.setor] = (dadosSetor[l.setor] || 0) + l.qtd;
+    });
 
-    <div id="painel-pendencias" class="mb-8 hidden">
-        <h3 class="font-black text-red-600 mb-3 text-xs uppercase italic flex items-center gap-2">⚠️ Ferramentas em Uso (Pendentes de Devolução)</h3>
-        <div id="lista-pendencias" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-    </div>
+    // 2. Agrupar por Funcionário (Top 5)
+    const dadosFunc = {};
+    logsPeriodo.forEach(l => {
+        dadosFunc[l.resp] = (dadosFunc[l.resp] || 0) + l.qtd;
+    });
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Reposição Urgente</p>
-            <h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2>
-        </div>
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Movimentos (7d)</p>
-            <h2 id="dash-saidas" class="text-3xl font-black text-blue-600">0</h2>
-        </div>
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Total em Peças</p>
-            <h2 id="dash-total" class="text-3xl font-black text-green-600">0</h2>
-        </div>
-        <div class="card-dash">
-            <p class="text-gray-400 text-[10px] font-black uppercase tracking-tighter">Aluguéis Ativos</p>
-            <h2 id="dash-aluguel" class="text-3xl font-black text-amber-500">0</h2>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-4 space-y-6">
-            
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 id="form-title" class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Gestão de Produto</h3>
-                <input type="hidden" id="edit-id">
-                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-vinho/10 uppercase font-bold text-sm">
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
-                        <option value="Insumo">Insumo (📦)</option>
-                        <option value="Ferramenta">Ferramenta (🛠️)</option>
-                    </select>
-                    <input type="number" id="p-min" placeholder="Min" class="border p-3 rounded-xl text-center font-bold">
-                </div>
-                <div id="div-qtd-inicial" class="mb-3">
-                    <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold text-xl">
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho text-white p-4 rounded-2xl font-black uppercase text-xs hover:bg-opacity-90">Salvar</button>
-                    <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-200 text-gray-600 px-6 rounded-2xl font-black hover:bg-gray-300">X</button>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚙️ Configurar Setores</h3>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="novo-setor" placeholder="NOVO SETOR..." class="flex-1 border p-2 rounded-xl uppercase text-[10px] font-bold outline-none focus:border-vinho">
-                    <button onclick="adicionarSetor()" class="bg-vinho text-white px-4 rounded-xl font-bold hover:bg-opacity-90">+</button>
-                </div>
-                <div id="lista-setores-badges" class="flex flex-wrap gap-2"></div>
-            </div>
-
-            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho relative">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Registrar Movimento</h3>
-                <div class="relative">
-                    <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3 focus:border-vinho">
-                    <div id="lista-busca" class="search-results hidden"></div>
-                </div>
-                <input type="hidden" id="m-id-selecionado">
-                <div class="grid grid-cols-2 gap-2 mb-3">
-                    <select id="m-op" class="border p-3 rounded-xl font-black bg-gray-50 text-vinho uppercase text-xs">
-                        <option value="saida">Saída (-)</option>
-                        <option value="entrada">Entrada (+)</option>
-                    </select>
-                    <input type="number" id="m-qtd" placeholder="Qtd" class="border p-3 rounded-xl font-black text-center text-xl text-vinho">
-                </div>
-                <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
-                <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold uppercase"></select>
-                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase shadow-lg hover:bg-green-700 transition transform active:scale-95">Confirmar Agora</button>
-            </div>
-
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-amber-200">
-                <h3 class="font-black text-amber-600 mb-4 text-xs uppercase italic border-b pb-2">🤝 Gestão de Aluguéis</h3>
-                <div class="space-y-2 mb-4">
-                    <input type="text" id="aluguel-item" placeholder="EQUIPAMENTO" class="w-full border p-3 rounded-xl text-xs uppercase font-bold">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="date" id="aluguel-data" class="border p-3 rounded-xl text-xs font-bold">
-                        <input type="text" id="aluguel-fornecedor" placeholder="FORNECEDOR" class="border p-3 rounded-xl text-xs uppercase font-bold">
-                    </div>
-                    <button onclick="registrarAluguel()" class="w-full bg-amber-500 text-white p-3 rounded-xl font-black text-xs uppercase hover:bg-amber-600">Registrar Aluguel</button>
-                </div>
-                <div id="lista-alugueis" class="space-y-3 max-h-48 overflow-y-auto pr-1"></div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                 <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Atividades Recentes</h3>
-                 <div id="historico-lista" class="space-y-2 max-h-60 overflow-y-auto"></div>
-            </div>
-        </div>
-
-        <div class="lg:col-span-8">
-            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden sticky top-4">
-                <div class="p-6 bg-gray-50/50 border-b">
-                    <h3 class="font-black text-vinho text-xs uppercase italic">📦 Monitor de Estoque Geral</h3>
-                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 FILTRAR ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100 mt-2 focus:ring-2 ring-vinho/10">
-                </div>
-                <div class="overflow-x-auto px-4 pb-4">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-[10px] uppercase text-gray-400 font-black tracking-widest border-b">
-                                <th class="p-4">Material / Produto</th>
-                                <th class="p-4 text-center">Saldo Atual</th>
-                                <th class="p-4 text-center">Status</th>
-                                <th class="p-4 text-right">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-corpo"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="signature italic">Produced by J Guilherme A.C. | V9.5</div>
-
-<div style="position: absolute; left: -9999px;">
-    <canvas id="canvasSetor" width="400" height="400"></canvas>
-</div>
-
-<script>
-    // ==========================================
-    // 1. CONFIGURAÇÃO E DADOS INICIAIS
-    // ==========================================
-    const PIN = "0000"; 
-    let produtos = JSON.parse(localStorage.getItem('almox_final_prods')) || [];
-    let logs = JSON.parse(localStorage.getItem('almox_final_logs')) || [];
-    let setores = JSON.parse(localStorage.getItem('almox_setores')) || ["MONTAGEM", "PINTURA", "MARCENARIA"];
-    let alugueis = JSON.parse(localStorage.getItem('almox_alugueis')) || [];
-    let pendencias = JSON.parse(localStorage.getItem('almox_pendencias')) || [];
-
-    // ==========================================
-    // 2. INICIALIZAÇÃO E UTILITÁRIOS
-    // ==========================================
-    window.onload = () => {
-        const hoje = new Date();
-        const semanaPassada = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
-        document.getElementById('filtro-fim').value = hoje.toISOString().split('T')[0];
-        document.getElementById('filtro-inicio').value = semanaPassada.toISOString().split('T')[0];
-        
-        atualizarSelectSetores();
-        carregarLogoSalva(); // Nova função: Carrega a logo da empresa
-        executarLimpezaAutomatica(); // Nova função: Limpeza de logs antigos
-    };
-
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
-
-    function autenticar() {
-        if(document.getElementById('pin-input').value === PIN) {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            render(); renderAlugueis(); renderPendencias();
-        } else { alert("ACESSO NEGADO"); }
+    // --- CABEÇALHO DO PDF ---
+    // Tenta pegar a logo customizada
+    const logoSalva = localStorage.getItem('almox_logo_img');
+    if(logoSalva) {
+        doc.addImage(logoSalva, 'PNG', 15, 10, 20, 20);
+        doc.setFontSize(22); doc.setTextColor(77, 0, 17);
+        doc.text("RELATÓRIO DE CONSUMO", 40, 25);
+    } else {
+        doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(255); doc.setFontSize(22);
+        doc.text("RELATÓRIO DE CONSUMO", 15, 20);
     }
+    
+    doc.setFontSize(10); doc.setTextColor(100);
+    doc.text(`Período: ${document.getElementById('filtro-inicio').value} até ${document.getElementById('filtro-fim').value}`, 15, 40);
 
-    // ==========================================
-    // 3. LOGO DA EMPRESA (NOVA FUNCIONALIDADE)
-    // ==========================================
-    function salvarLogo(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    // --- GERAR GRÁFICOS (Truque: Usar o Canvas invisível do HTML) ---
+    const canvas = document.getElementById('canvasSetor');
+    // Se já existir gráfico anterior, destruir
+    if(window.meuGraficoPDF) window.meuGraficoPDF.destroy();
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = function() {
-                // Redimensionar para economizar espaço
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxW = 150, maxH = 150;
-                let w = img.width, h = img.height;
-                
-                if (w > h) { if (w > maxW) { h *= maxW / w; w = maxW; } } 
-                else { if (h > maxH) { w *= maxH / h; h = maxH; } }
+    // Criar Gráfico de Setores
+    window.meuGraficoPDF = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(dadosSetor),
+            datasets: [{
+                data: Object.values(dadosSetor),
+                backgroundColor: ['#4d0011', '#e11d48', '#f59e0b', '#10b981', '#3b82f6', '#6366f1']
+            }]
+        },
+        options: { animation: false, responsive: false } // Sem animação para renderizar rápido
+    });
 
-                canvas.width = w; canvas.height = h;
-                ctx.drawImage(img, 0, 0, w, h);
-                
-                const dataURL = canvas.toDataURL('image/png');
-                localStorage.setItem('almox_logo_img', dataURL);
-                document.getElementById('img-logo').src = dataURL;
-            };
-        };
-        reader.readAsDataURL(file);
-    }
+    // Esperar um pouquinho para o Chart.js renderizar
+    await new Promise(r => setTimeout(r, 500));
+    
+    // Adicionar Gráfico de Setores ao PDF
+    const imgSetor = canvas.toDataURL("image/png");
+    doc.setFontSize(14); doc.setTextColor(0);
+    doc.text("Consumo por Setor (Qtd Peças)", 15, 55);
+    doc.addImage(imgSetor, 'PNG', 15, 60, 80, 80);
 
-    function carregarLogoSalva() {
-        const logo = localStorage.getItem('almox_logo_img');
-        if (logo) document.getElementById('img-logo').src = logo;
-    }
+    // Destruir e criar Gráfico de Funcionários
+    window.meuGraficoPDF.destroy();
+    
+    // Pegar Top 5 Funcionários
+    const topFuncs = Object.entries(dadosFunc).sort((a,b) => b[1] - a[1]).slice(0, 5);
+    
+    window.meuGraficoPDF = new Chart(canvas, {
+        type: 'pie',
+        data: {
+            labels: topFuncs.map(f => f[0]), // Nomes
+            datasets: [{
+                data: topFuncs.map(f => f[1]), // Qtds
+                backgroundColor: ['#1e293b', '#334155', '#475569', '#64748b', '#94a3b8']
+            }]
+        },
+        options: { animation: false, responsive: false }
+    });
 
-    // ==========================================
-    // 4. LIMPEZA AUTOMÁTICA (NOVA FUNCIONALIDADE)
-    // ==========================================
-    function executarLimpezaAutomatica() {
-        const DIAS_PARA_MANTER = 60; // Configuração de Dias
-        const dataLimite = Date.now() - (DIAS_PARA_MANTER * 24 * 60 * 60 * 1000);
-        const logsAntes = logs.length;
+    await new Promise(r => setTimeout(r, 500));
 
-        // Filtra mantendo apenas os logs mais novos que a data limite
-        logs = logs.filter(log => log.t > dataLimite);
+    // Adicionar Gráfico de Funcionários ao PDF
+    const imgFunc = canvas.toDataURL("image/png");
+    doc.text("Top 5 Funcionários que mais retiram", 110, 55);
+    doc.addImage(imgFunc, 'PNG', 110, 60, 80, 80);
 
-        if (logs.length < logsAntes) {
-            console.log(`Limpeza Auto: ${logsAntes - logs.length} registros antigos removidos.`);
-            salvar();
-        }
-    }
+    // --- TABELA DETALHADA ABAIXO ---
+    let yPos = 150;
+    doc.text("Detalhamento das Saídas", 15, 145);
+    
+    const logsTabela = logsPeriodo.sort((a,b) => b.t - a.t); // Mais recentes primeiro
+    
+    doc.autoTable({
+        startY: yPos,
+        head: [['Data', 'Setor', 'Produto', 'Qtd', 'Solicitante']],
+        body: logsTabela.map(l => [l.data.split(' ')[0], l.setor, l.prod, l.qtd, l.resp]),
+        theme: 'grid',
+        headStyles: { fillColor: [77, 0, 17] },
+        styles: { fontSize: 8 }
+    });
 
-    // ==========================================
-    // 5. LÓGICA DE SETORES
-    // ==========================================
-    function atualizarSelectSetores() {
-        const select = document.getElementById('m-setor');
-        const container = document.getElementById('lista-setores-badges');
-        select.innerHTML = '<option value="">-- SELECIONE O SETOR --</option>';
-        container.innerHTML = '';
-        setores.forEach((s, i) => {
-            select.innerHTML += `<option value="${s}">${s}</option>`;
-            container.innerHTML += `<span class="bg-gray-100 text-vinho px-3 py-1 rounded-full text-[9px] font-black flex items-center gap-2 border border-vinho/10">${s} <button onclick="removerSetor(${i})" class="text-red-500 hover:text-red-700">×</button></span>`;
-        });
-        localStorage.setItem('almox_setores', JSON.stringify(setores));
-    }
-
-    function adicionarSetor() {
-        const nome = document.getElementById('novo-setor').value.toUpperCase().trim();
-        if(nome && !setores.includes(nome)) {
-            setores.push(nome);
-            document.getElementById('novo-setor').value = '';
-            atualizarSelectSetores();
-        }
-    }
-
-    function removerSetor(index) {
-        if(confirm("Remover este setor?")) { setores.splice(index, 1); atualizarSelectSetores(); }
-    }
-
-    // ==========================================
-    // 6. LÓGICA DE PRODUTOS
-    // ==========================================
-    function salvarProduto() {
-        const id = document.getElementById('edit-id').value;
-        const nome = document.getElementById('p-nome').value.toUpperCase();
-        const tipo = document.getElementById('p-tipo').value;
-        const min = parseInt(document.getElementById('p-min').value) || 0;
-        const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
-        
-        if(!nome) return alert("Preencha o nome do material!");
-        
-        if(id) {
-            const idx = produtos.findIndex(p => p.id == id);
-            produtos[idx] = { ...
+    doc.save(`Relatorio_Grafico_Almox.pdf`);
+}
