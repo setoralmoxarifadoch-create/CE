@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V10.5 - J. GUILHERME</title>
+    <title>ALMOXARIFADO INTELLIGENT V10.6 - J. GUILHERME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="login-screen" class="fixed inset-0 bg-vinho z-[100] flex items-center justify-center">
     <div class="bg-white p-10 rounded-3xl shadow-2xl w-96 text-center">
-        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V10.5</h2>
+        <h2 class="text-vinho font-black text-3xl mb-2 uppercase italic">Master V10.6</h2>
         <p class="text-gray-400 text-xs mb-8 font-bold">Produced by J Guilherme A.C.</p>
         <input type="password" id="pin-input" placeholder="PIN" class="w-full border-2 p-4 mb-4 text-center text-3xl outline-none rounded-2xl focus:border-vinho">
         <button onclick="autenticar()" class="w-full bg-vinho text-white p-4 rounded-2xl font-black uppercase tracking-widest hover:brightness-110 transition">Acessar</button>
@@ -51,7 +51,7 @@
         <div class="flex flex-wrap items-center bg-white/10 p-3 rounded-2xl gap-3">
             <input type="date" id="filtro-inicio" class="text-black text-[10px] p-1 rounded">
             <input type="date" id="filtro-fim" class="text-black text-[10px] p-1 rounded">
-            <button onclick="gerarRelatorioAvancado()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço Analítico & Financeiro</button>
+            <button onclick="gerarRelatorioAvancado()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço Financeiro PDF</button>
         </div>
 
         <div class="flex gap-2">
@@ -62,9 +62,9 @@
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Reposição Urgente</p><h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2></div>
-        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Investimento Estoque</p><h2 id="dash-financeiro" class="text-3xl font-black text-green-700">R$ 0,00</h2></div>
-        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Total de Peças</p><h2 id="dash-total" class="text-3xl font-black text-blue-600">0</h2></div>
+        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Críticos</p><h2 id="dash-criticos" class="text-3xl font-black text-red-600">0</h2></div>
+        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Valor em Estoque</p><h2 id="dash-financeiro" class="text-3xl font-black text-green-700">R$ 0,00</h2></div>
+        <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Total Peças</p><h2 id="dash-total" class="text-3xl font-black text-blue-600">0</h2></div>
         <div class="card-dash"><p class="text-gray-400 text-[10px] font-black uppercase">Aluguéis Ativos</p><h2 id="dash-aluguel" class="text-3xl font-black text-amber-500">0</h2></div>
     </div>
 
@@ -72,46 +72,44 @@
         <div class="lg:col-span-4 space-y-6">
             
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 id="form-title" class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Gestão de Produto</h3>
+                <h3 id="form-title" class="font-black text-vinho mb-4 text-xs uppercase italic">📝 Cadastro de Produto</h3>
                 <input type="hidden" id="edit-id">
-                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-vinho/10 uppercase font-bold text-sm">
-                
+                <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full border p-3 rounded-xl mb-3 outline-none uppercase font-bold text-sm">
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <select id="p-tipo" class="border p-3 rounded-xl bg-gray-50 text-xs font-bold uppercase">
                         <option value="Insumo">Insumo</option>
                         <option value="Ferramenta">Ferramenta</option>
                     </select>
-                    <input type="number" id="p-min" placeholder="Estoque Mín" class="border p-3 rounded-xl text-center font-bold text-xs">
+                    <input type="number" id="p-min" placeholder="Mínimo" class="border p-3 rounded-xl text-center font-bold">
                 </div>
-
                 <div class="grid grid-cols-2 gap-2 mb-3">
-                    <div class="flex flex-col">
-                        <span class="text-[9px] font-bold text-gray-400 ml-1">VALOR UNIT. (R$)</span>
-                        <input type="number" step="0.01" id="p-valor" placeholder="0.00" class="border p-3 rounded-xl text-center font-bold text-green-700">
-                    </div>
-                    <div id="div-qtd-inicial" class="flex flex-col">
-                        <span class="text-[9px] font-bold text-gray-400 ml-1">QTD INICIAL</span>
-                        <input type="number" id="p-qtd" placeholder="0" class="border p-3 rounded-xl text-center font-bold">
+                    <input type="number" step="0.01" id="p-valor" placeholder="Preço R$" class="border p-3 rounded-xl text-center font-bold text-green-700">
+                    <div id="div-qtd-inicial">
+                        <input type="number" id="p-qtd" placeholder="Qtd Inicial" class="w-full border p-3 rounded-xl text-center font-bold">
                     </div>
                 </div>
-
                 <div class="flex gap-2">
                     <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho text-white p-4 rounded-2xl font-black uppercase text-xs">Salvar</button>
                     <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-gray-200 text-gray-600 px-6 rounded-2xl font-black">X</button>
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚙️ Setores</h3>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="novo-setor" placeholder="NOVO SETOR..." class="flex-1 border p-2 rounded-xl uppercase text-[10px] font-bold outline-none">
-                    <button onclick="adicionarSetor()" class="bg-vinho text-white px-4 rounded-xl font-bold">+</button>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 bg-amber-50/30">
+                <h3 class="font-black text-amber-700 mb-4 text-xs uppercase italic">🏗️ Aluguéis de Equipamentos</h3>
+                <input type="text" id="alug-item" placeholder="EQUIPAMENTO" class="w-full border p-3 rounded-xl mb-2 uppercase font-bold text-xs">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input type="text" id="alug-empresa" placeholder="FORNECEDOR" class="border p-3 rounded-xl uppercase font-bold text-[10px]">
+                    <input type="number" step="0.01" id="alug-valor" placeholder="Custo Mensal R$" class="border p-3 rounded-xl font-bold text-xs">
                 </div>
-                <div id="lista-setores-badges" class="flex flex-wrap gap-2"></div>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <input type="date" id="alug-data" class="border p-2 rounded-xl text-xs font-bold">
+                    <button onclick="salvarAluguel()" class="bg-amber-600 text-white rounded-xl font-black uppercase text-[10px]">Registrar</button>
+                </div>
+                <div id="lista-alugueis" class="space-y-2 max-h-40 overflow-y-auto"></div>
             </div>
 
             <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-vinho">
-                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Saída/Entrada</h3>
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">⚡ Registrar Movimento</h3>
                 <div class="relative">
                     <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full border-2 border-vinho/10 p-4 rounded-2xl font-black outline-none mb-3">
                     <div id="lista-busca" class="search-results hidden shadow-xl border"></div>
@@ -126,19 +124,25 @@
                 </div>
                 <input type="text" id="m-nome" placeholder="NOME DO FUNCIONÁRIO" class="w-full border p-3 rounded-xl mb-3 uppercase text-xs font-bold">
                 <select id="m-setor" class="w-full border p-3 rounded-xl bg-gray-50 mb-4 text-xs font-bold uppercase"></select>
-                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase">Confirmar Movimento</button>
+                <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-2xl font-black uppercase">Confirmar</button>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 class="font-black text-vinho mb-4 text-xs uppercase italic">🕒 Histórico Recente</h3>
+                <div id="historico-lista" class="space-y-3"></div>
             </div>
         </div>
 
         <div class="lg:col-span-8 space-y-6">
             <div id="painel-pendencias" class="hidden">
-                <h3 class="font-black text-red-600 mb-3 text-xs uppercase italic">⚠️ Ferramentas Pendentes de Devolução</h3>
+                <h3 class="font-black text-red-600 mb-3 text-xs uppercase italic">⚠️ Pendências</h3>
                 <div id="lista-pendencias" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 bg-gray-50/50 border-b">
-                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 BUSCAR NO ESTOQUE..." class="w-full bg-white p-4 rounded-2xl shadow-inner outline-none font-bold text-vinho border border-gray-100">
+                <div class="p-6 bg-gray-50/50 border-b flex justify-between items-center">
+                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 BUSCAR NO ESTOQUE..." class="w-2/3 bg-white p-4 rounded-2xl outline-none font-bold border">
+                    <div class="text-right"><p class="text-[10px] font-bold text-gray-400">SETOR ATUAL</p><div id="lista-setores-badges" class="flex gap-1 justify-end"></div></div>
                 </div>
                 <div class="overflow-x-auto p-4">
                     <table class="w-full text-left">
@@ -146,7 +150,7 @@
                             <tr class="text-[10px] uppercase text-gray-400 font-black tracking-widest">
                                 <th class="p-4">Material</th>
                                 <th class="p-4 text-center">Saldo</th>
-                                <th class="p-4 text-center">V. Unit.</th>
+                                <th class="p-4 text-center">Valor Unit.</th>
                                 <th class="p-4 text-center">Status</th>
                                 <th class="p-4 text-right">Ação</th>
                             </tr>
@@ -160,7 +164,7 @@
 </div>
 
 <div style="position: absolute; left: -9999px;"><canvas id="chartCanvas" width="400" height="400"></canvas></div>
-<div class="signature italic">Produced by J Guilherme A.C. | V10.5</div>
+<div class="signature italic">Produced by J Guilherme A.C. | V10.6</div>
 
 <script>
     const PIN = "0000"; 
@@ -177,6 +181,7 @@
         carregarLogo();
         atualizarSelectSetores();
         render();
+        renderAlugueis();
         renderPendencias();
     };
 
@@ -189,10 +194,7 @@
 
     function uploadLogo(event) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-            localStorage.setItem('almox_logo_img', e.target.result);
-            carregarLogo();
-        };
+        reader.onload = (e) => { localStorage.setItem('almox_logo_img', e.target.result); carregarLogo(); };
         reader.readAsDataURL(event.target.files[0]);
     }
 
@@ -208,23 +210,8 @@
     function atualizarSelectSetores() {
         const select = document.getElementById('m-setor');
         const container = document.getElementById('lista-setores-badges');
-        select.innerHTML = '<option value="">-- SELECIONE O SETOR --</option>' + 
-            setores.map(s => `<option value="${s}">${s}</option>`).join('');
-        container.innerHTML = setores.map((s, i) => `<span class="bg-gray-100 text-[9px] px-2 py-1 rounded-full font-bold text-vinho border border-vinho/10 flex items-center gap-1">${s} <button onclick="removerSetor(${i})" class="text-red-500">×</button></span>`).join('');
-    }
-
-    function adicionarSetor() {
-        const nome = document.getElementById('novo-setor').value.toUpperCase().trim();
-        if(nome && !setores.includes(nome)) {
-            setores.push(nome);
-            document.getElementById('novo-setor').value = '';
-            atualizarSelectSetores();
-            salvar();
-        }
-    }
-
-    function removerSetor(i) {
-        if(confirm("Excluir setor?")) { setores.splice(i, 1); atualizarSelectSetores(); salvar(); }
+        select.innerHTML = '<option value="">-- SETOR --</option>' + setores.map(s => `<option value="${s}">${s}</option>`).join('');
+        container.innerHTML = setores.map((s, i) => `<span class="bg-gray-100 text-[8px] px-2 py-1 rounded-full font-bold text-vinho border border-vinho/10">${s}</span>`).join('');
     }
 
     function salvarProduto() {
@@ -234,7 +221,6 @@
         const min = parseInt(document.getElementById('p-min').value) || 0;
         const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
         const valor = parseFloat(document.getElementById('p-valor').value) || 0;
-        
         if(!nome) return;
         if(id) {
             const idx = produtos.findIndex(p => p.id == id);
@@ -244,6 +230,31 @@
         }
         cancelarEdicao(); salvar(); render();
     }
+
+    function salvarAluguel() {
+        const item = document.getElementById('alug-item').value.toUpperCase();
+        const empresa = document.getElementById('alug-empresa').value.toUpperCase();
+        const valor = parseFloat(document.getElementById('alug-valor').value) || 0;
+        const data = document.getElementById('alug-data').value;
+        if(!item || !empresa) return alert("Preencha os dados do aluguel!");
+        alugueis.push({ id: Date.now(), item, empresa, valor, data });
+        document.getElementById('alug-item').value = '';
+        document.getElementById('alug-valor').value = '';
+        salvar(); renderAlugueis();
+    }
+
+    function renderAlugueis() {
+        const lista = document.getElementById('lista-alugueis');
+        lista.innerHTML = alugueis.map(a => `
+            <div class="bg-white p-2 rounded-xl border flex justify-between items-center shadow-sm">
+                <div><p class="text-[10px] font-black text-amber-700">${a.item}</p><p class="text-[8px] text-gray-400">${a.empresa} - R$ ${a.valor.toFixed(2)}</p></div>
+                <button onclick="finalizarAluguel(${a.id})" class="text-red-500 font-black text-[9px]">X</button>
+            </div>
+        `).join('');
+        document.getElementById('dash-aluguel').innerText = alugueis.length;
+    }
+
+    function finalizarAluguel(id) { alugueis = alugueis.filter(a => a.id !== id); salvar(); renderAlugueis(); }
 
     function buscarItemMovimento(v) {
         const lista = document.getElementById('lista-busca');
@@ -265,7 +276,7 @@
         const qtd = parseInt(document.getElementById('m-qtd').value);
         const setor = document.getElementById('m-setor').value;
         const resp = document.getElementById('m-nome').value.toUpperCase();
-        if(!id || !qtd || !resp) return alert("Preencha todos os campos!");
+        if(!id || !qtd || !resp) return alert("Preencha tudo!");
 
         const p = produtos.find(item => item.id == id);
         if(op === 'saida') {
@@ -277,25 +288,26 @@
         logs.push({ t: Date.now(), tipo: op.toUpperCase(), prod: p.nome, qtd, valorUnit: p.valor || 0, setor: op==='saida'?setor:'ALMOX', resp });
         salvar(); render(); renderPendencias();
         document.getElementById('m-busca-item').value = '';
-        document.getElementById('m-qtd').value = '';
     }
 
     function render() {
         const busca = document.getElementById('busca-geral').value.toLowerCase();
         const corpo = document.getElementById('lista-corpo');
+        const hist = document.getElementById('historico-lista');
         corpo.innerHTML = '';
         let criticos = 0, totalP = 0, financeiro = 0;
 
-        produtos.sort((a,b) => (a.qtd <= a.min ? -1 : 1)).forEach(p => {
+        produtos.forEach(p => {
             totalP += p.qtd;
-            financeiro += (p.qtd * (p.valor || 0));
+            financeiro += (p.qtd * p.valor);
             if(p.nome.toLowerCase().includes(busca)) {
                 let isCritico = p.qtd <= p.min;
                 if(isCritico) criticos++;
-                corpo.innerHTML += `<tr class="border-b"><td class="p-4 text-xs font-bold">${p.nome}<br><span class="text-[8px] opacity-40">TIPO: ${p.tipo}</span></td><td class="p-4 text-center font-black text-lg">${p.qtd}</td><td class="p-4 text-center text-xs font-bold text-green-700">R$ ${(p.valor || 0).toFixed(2)}</td><td class="p-4 text-center"><span class="${isCritico?'status-vermelho':'bg-green-100 text-green-700'} text-[8px] px-2 py-1 rounded font-bold">${isCritico?'REPOR':'OK'}</span></td><td class="p-4 text-right"><button onclick="editarItem(${p.id})" class="text-blue-500 font-bold text-[10px]">EDITAR</button></td></tr>`;
+                corpo.innerHTML += `<tr class="border-b"><td class="p-4 text-xs font-bold">${p.nome}</td><td class="p-4 text-center font-black text-lg">${p.qtd}</td><td class="p-4 text-center font-bold text-green-700">R$ ${p.valor.toFixed(2)}</td><td class="p-4 text-center"><span class="${isCritico?'status-vermelho':'bg-green-100 text-green-700'} text-[8px] px-2 py-1 rounded font-bold">${isCritico?'REPOR':'OK'}</span></td><td class="p-4 text-right"><button onclick="editarItem(${p.id})" class="text-blue-500 font-bold text-[10px]">EDITAR</button></td></tr>`;
             }
         });
 
+        hist.innerHTML = logs.slice(-5).reverse().map(l => `<div class="text-[9px] bg-gray-50 p-2 rounded border-l-2 ${l.tipo==='SAIDA'?'border-red-500':'border-green-500'} font-bold"> ${l.tipo}: ${l.prod} (${l.qtd}) - ${l.resp}</div>`).join('');
         document.getElementById('dash-criticos').innerText = criticos;
         document.getElementById('dash-total').innerText = totalP;
         document.getElementById('dash-financeiro').innerText = financeiro.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'});
@@ -306,7 +318,7 @@
         const lista = document.getElementById('lista-pendencias');
         if(pendencias.length === 0) { painel.classList.add('hidden'); return; }
         painel.classList.remove('hidden');
-        lista.innerHTML = pendencias.map(p => `<div class="bg-red-50 border-l-4 border-red-500 p-3 rounded flex justify-between items-center shadow-sm"><div><p class="text-[10px] font-black">${p.prodNome} (${p.qtd})</p><p class="text-[8px] font-bold text-gray-500">${p.resp} | ${p.setor}</p></div><button onclick="devolver(${p.id})" class="bg-green-600 text-white px-3 py-1 rounded text-[8px] font-bold uppercase">Devolver</button></div>`).join('');
+        lista.innerHTML = pendencias.map(p => `<div class="bg-red-50 border-l-4 border-red-500 p-3 rounded flex justify-between items-center"><div><p class="text-[10px] font-black">${p.prodNome}</p><p class="text-[8px] text-gray-500">${p.resp}</p></div><button onclick="devolver(${p.id})" class="bg-green-600 text-white px-3 py-1 rounded text-[8px] font-bold">Devolver</button></div>`).join('');
     }
 
     function devolver(id) {
@@ -327,79 +339,36 @@
         const logsPeriodo = logs.filter(l => l.t >= dIni && l.t <= dFim && l.tipo === 'SAIDA');
 
         doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 40, 'F');
-        const logo = localStorage.getItem('almox_logo_img');
-        if(logo) doc.addImage(logo, 'PNG', 165, 5, 30, 30);
-        doc.setTextColor(255); doc.setFontSize(18); doc.text("BALANÇO ANALÍTICO & FINANCEIRO", 15, 25);
+        doc.setTextColor(255); doc.setFontSize(16); doc.text("BALANÇO FINANCEIRO E CONSUMO", 15, 25);
         
         if(logsPeriodo.length > 0) {
-            // Cálculo por Setor (Financeiro)
-            const financeiroSetor = {};
-            logsPeriodo.forEach(l => {
-                const custo = l.qtd * (l.valorUnit || 0);
-                financeiroSetor[l.setor] = (financeiroSetor[l.setor] || 0) + custo;
-            });
+            const custosPorSetor = {};
+            logsPeriodo.forEach(l => { custosPorSetor[l.setor] = (custosPorSetor[l.setor] || 0) + (l.qtd * (l.valorUnit || 0)); });
 
-            // Gráfico de Pizza baseado em VALORES R$
             const ctx = document.getElementById('chartCanvas').getContext('2d');
             if(window.myChart) window.myChart.destroy();
-            window.myChart = new Chart(ctx, { 
-                type: 'pie', 
-                data: { 
-                    labels: Object.keys(financeiroSetor), 
-                    datasets: [{ 
-                        data: Object.values(financeiroSetor), 
-                        backgroundColor: ['#4d0011', '#e11d48', '#fbbf24', '#3b82f6', '#10b981'] 
-                    }] 
-                }, 
-                options: { animation: false, plugins: { title: { display: true, text: 'Distribuição de Gastos por Setor (R$)' } } } 
-            });
-
-            await new Promise(r => setTimeout(r, 800));
+            window.myChart = new Chart(ctx, { type: 'pie', data: { labels: Object.keys(custosPorSetor), datasets: [{ data: Object.values(custosPorSetor), backgroundColor: ['#4d0011', '#e11d48', '#fbbf24', '#3b82f6', '#10b981'] }] }, options: { animation: false } });
+            
+            await new Promise(r => setTimeout(r, 600));
             doc.addImage(document.getElementById('chartCanvas').toDataURL('image/png'), 'PNG', 60, 50, 90, 90);
 
             let y = 150;
-            doc.setTextColor(77, 0, 17); doc.setFontSize(12); doc.text("RESUMO DE GASTOS POR SETOR", 15, y);
-            y += 10;
-
-            Object.keys(financeiroSetor).forEach(setor => {
-                if(y > 250) { doc.addPage(); y = 20; }
+            Object.keys(custosPorSetor).forEach(setor => {
+                if(y > 240) { doc.addPage(); y = 20; }
                 const logsS = logsPeriodo.filter(l => l.setor === setor);
-                
-                // Quem mais gasta no setor
                 const gastosFunc = {};
-                logsS.forEach(l => { gastosFunc[l.resp] = (gastosFunc[l.resp] || 0) + (l.qtd * (l.valorUnit || 0)); });
-                const topGasto = Object.entries(gastosFunc).sort((a,b) => b[1]-a[1])[0];
+                logsS.forEach(l => { gastosFunc[l.resp] = (gastosFunc[l.resp]||0) + (l.qtd * l.valorUnit); });
+                const topGasto = Object.entries(gastosFunc).sort((a,b)=>b[1]-a[1])[0];
 
-                doc.setFillColor(245, 245, 245); doc.rect(15, y, 180, 15, 'F');
-                doc.setTextColor(0); doc.setFontSize(9);
-                doc.text(`SETOR: ${setor} | TOTAL: R$ ${financeiroSetor[setor].toFixed(2)}`, 20, y+6);
-                doc.setFontSize(8); doc.setTextColor(100);
-                doc.text(`MAIOR CONSUMO: ${topGasto[0]} (R$ ${topGasto[1].toFixed(2)})`, 20, y+11);
+                doc.setTextColor(77, 0, 17); doc.setFontSize(10); doc.text(`SETOR: ${setor} | TOTAL: R$ ${custosPorSetor[setor].toFixed(2)}`, 15, y);
+                doc.setFontSize(8); doc.setTextColor(50);
+                doc.text(`QUEM MAIS GASTOU: ${topGasto[0]} (R$ ${topGasto[1].toFixed(2)})`, 15, y+5);
                 
-                doc.autoTable({ 
-                    startY: y+16, 
-                    head: [['Data', 'Func.', 'Item', 'Qtd', 'V.Unit', 'Subtotal']], 
-                    body: logsS.map(l => [
-                        new Date(l.t).toLocaleDateString(), 
-                        l.resp, l.prod, l.qtd, 
-                        `R$ ${l.valorUnit.toFixed(2)}`, 
-                        `R$ ${(l.qtd * l.valorUnit).toFixed(2)}`
-                    ]), 
-                    styles: { fontSize: 7 }, 
-                    headStyles: { fillColor: [77, 0, 17] } 
-                });
-                y = doc.lastAutoTable.finalY + 15;
+                doc.autoTable({ startY: y+8, head: [['Data', 'Func.', 'Item', 'Subtotal']], body: logsS.map(l => [new Date(l.t).toLocaleDateString(), l.resp, l.prod, "R$ " + (l.qtd * l.valorUnit).toFixed(2)]), styles: { fontSize: 7 } });
+                y = doc.lastAutoTable.finalY + 10;
             });
         }
-        doc.save(`Relatorio_Financeiro_${new Date().toLocaleDateString()}.pdf`);
-    }
-
-    function salvar() {
-        localStorage.setItem('almox_final_prods', JSON.stringify(produtos));
-        localStorage.setItem('almox_final_logs', JSON.stringify(logs));
-        localStorage.setItem('almox_setores', JSON.stringify(setores));
-        localStorage.setItem('almox_alugueis', JSON.stringify(alugueis));
-        localStorage.setItem('almox_pendencias', JSON.stringify(pendencias));
+        doc.save("Relatorio_Financeiro.pdf");
     }
 
     function editarItem(id) {
@@ -407,28 +376,25 @@
         document.getElementById('edit-id').value = p.id;
         document.getElementById('p-nome').value = p.nome;
         document.getElementById('p-min').value = p.min;
-        document.getElementById('p-tipo').value = p.tipo;
-        document.getElementById('p-valor').value = p.valor || 0;
+        document.getElementById('p-valor').value = p.valor;
         document.getElementById('div-qtd-inicial').classList.add('hidden');
-        document.getElementById('form-title').innerText = "✏️ EDITAR PRODUTO";
+        document.getElementById('form-title').innerText = "✏️ EDITAR";
         document.getElementById('btn-cancelar').classList.remove('hidden');
-        window.scrollTo(0,0);
     }
 
     function cancelarEdicao() {
         document.getElementById('edit-id').value = "";
         document.getElementById('div-qtd-inicial').classList.remove('hidden');
-        document.getElementById('form-title').innerText = "📝 GESTÃO DE PRODUTO";
+        document.getElementById('form-title').innerText = "📝 CADASTRO";
         document.getElementById('btn-cancelar').classList.add('hidden');
         document.getElementById('p-nome').value = "";
-        document.getElementById('p-valor').value = "";
     }
 
     function fazerBackup() {
         const d = { prods: produtos, logs, setores, alugueis, pendencias };
         const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = `BKP_ALMOX_V10_5.json`; a.click();
+        a.download = `BKP_ALMOX_V10_6.json`; a.click();
     }
 
     function importarBackup(e) {
@@ -439,6 +405,14 @@
             salvar(); location.reload();
         };
         r.readAsText(e.target.files[0]);
+    }
+
+    function salvar() {
+        localStorage.setItem('almox_final_prods', JSON.stringify(produtos));
+        localStorage.setItem('almox_final_logs', JSON.stringify(logs));
+        localStorage.setItem('almox_setores', JSON.stringify(setores));
+        localStorage.setItem('almox_alugueis', JSON.stringify(alugueis));
+        localStorage.setItem('almox_pendencias', JSON.stringify(pendencias));
     }
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
