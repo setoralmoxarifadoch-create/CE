@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
         :root { --vinho: #4d0011; }
         body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-user-select: none; user-select: none; }
@@ -20,7 +21,6 @@
         .signature { position: fixed; bottom: 10px; right: 20px; font-size: 10px; color: #94a3b8; font-weight: bold; letter-spacing: 1px; pointer-events: none; }
         .hidden { display: none; }
         .pendencia-card { border-left: 4px solid #e11d48; background: #fff1f2; }
-        /* Novo estilo para valores */
         .text-valor { color: #16a34a; font-family: 'Courier New', monospace; font-weight: bold; }
     </style>
 </head>
@@ -46,7 +46,7 @@
             <div class="text-[10px] font-bold uppercase">Relatórios:</div>
             <input type="date" id="filtro-inicio" class="text-black text-xs p-1 rounded">
             <input type="date" id="filtro-fim" class="text-black text-xs p-1 rounded">
-            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço</button>
+            <button onclick="gerarRelatorioSetorGrafico()" class="bg-white text-vinho px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">📊 Balanço + Gráficos</button>
             <button onclick="gerarRelatorioAluguel()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase shadow-lg">🤝 Aluguéis</button>
         </div>
 
@@ -185,6 +185,7 @@
 
 <div style="position: absolute; left: -9999px;">
     <canvas id="canvasSetor" width="400" height="400"></canvas>
+    <canvas id="canvasFunc" width="400" height="400"></canvas>
 </div>
 
 <script>
@@ -213,7 +214,6 @@
         } else { alert("ACESSO NEGADO"); }
     }
 
-    // --- LOGICA DE SETORES ---
     function atualizarSelectSetores() {
         const select = document.getElementById('m-setor');
         const container = document.getElementById('lista-setores-badges');
@@ -239,7 +239,6 @@
         if(confirm("Remover setor?")) { setores.splice(index, 1); atualizarSelectSetores(); }
     }
 
-    // --- LOGICA DE ESTOQUE ---
     function salvarProduto() {
         const id = document.getElementById('edit-id').value;
         const nome = document.getElementById('p-nome').value.toUpperCase();
@@ -335,7 +334,6 @@
         salvar(); renderPendencias();
     }
 
-    // --- ALUGUEIS ---
     function registrarAluguel() {
         const item = document.getElementById('aluguel-item').value.toUpperCase();
         const data = document.getElementById('aluguel-data').value;
@@ -370,7 +368,6 @@
         renderAlugueis();
     }
 
-    // --- GERAL ---
     function render() {
         const busca = document.getElementById('busca-geral').value.toLowerCase();
         const corpo = document.getElementById('lista-corpo');
@@ -442,7 +439,7 @@
         r.readAsText(e.target.files[0]);
     }
 
-    // --- PDF ATUALIZADO COM GRÁFICO E VALORES ---
+    // --- PDF COM DUPLO GRÁFICO (SETOR E FUNCIONÁRIO) ---
     async function gerarRelatorioSetorGrafico() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -453,45 +450,64 @@
         if(logsPeriodo.length === 0) return alert("Sem saídas registradas no período selecionado!");
 
         doc.setFillColor(77, 0, 17); doc.rect(0, 0, 210, 45, 'F');
-        doc.setTextColor(255); doc.setFontSize(18); doc.text("BALANÇO FINANCEIRO E CONSUMO POR SETOR", 15, 25);
+        doc.setTextColor(255); doc.setFontSize(18); doc.text("BALANÇO FINANCEIRO E CONSUMO", 15, 25);
         doc.setFontSize(10); doc.text(`Gerado em: ${new Date().toLocaleString()}`, 15, 35);
 
-        // Agrupamento para o Gráfico
+        // Agrupamento para Gráficos
         const gastosPorSetor = {};
+        const gastosPorFunc = {};
+        
         logsPeriodo.forEach(l => {
-            gastosPorSetor[l.setor] = (gastosPorSetor[l.setor] || 0) + (parseFloat(l.valor) || 0);
+            const v = parseFloat(l.valor) || 0;
+            gastosPorSetor[l.setor] = (gastosPorSetor[l.setor] || 0) + v;
+            gastosPorFunc[l.resp] = (gastosPorFunc[l.resp] || 0) + v;
         });
 
-        // Gerar Gráfico de Pizza
-        const ctx = document.getElementById('canvasSetor').getContext('2d');
-        if(window.myChart) window.myChart.destroy();
-        window.myChart = new Chart(ctx, {
+        // Gráfico 1: Setores
+        const ctxSetor = document.getElementById('canvasSetor').getContext('2d');
+        if(window.chartSetor) window.chartSetor.destroy();
+        window.chartSetor = new Chart(ctxSetor, {
             type: 'pie',
             data: {
                 labels: Object.keys(gastosPorSetor),
-                datasets: [{ 
-                    data: Object.values(gastosPorSetor), 
-                    backgroundColor: ['#4d0011', '#e11d48', '#fbbf24', '#3b82f6', '#10b981', '#8b5cf6', '#64748b'] 
-                }]
+                datasets: [{ data: Object.values(gastosPorSetor), backgroundColor: ['#4d0011', '#e11d48', '#fbbf24', '#3b82f6', '#10b981', '#8b5cf6', '#64748b'] }]
             },
-            options: { 
-                animation: false,
-                plugins: { legend: { position: 'right' } }
-            }
+            options: { animation: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'GASTOS POR SETOR' } } }
         });
 
-        // Aguardar renderização do gráfico e inserir no PDF
-        await new Promise(r => setTimeout(r, 600));
-        const imgData = document.getElementById('canvasSetor').toDataURL('image/png');
-        doc.addImage(imgData, 'PNG', 65, 50, 80, 80);
+        // Gráfico 2: Funcionários
+        const ctxFunc = document.getElementById('canvasFunc').getContext('2d');
+        if(window.chartFunc) window.chartFunc.destroy();
+        window.chartFunc = new Chart(ctxFunc, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(gastosPorFunc),
+                datasets: [{ data: Object.values(gastosPorFunc), backgroundColor: ['#0f172a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'] }]
+            },
+            options: { animation: false, plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'GASTOS POR FUNCIONÁRIO' } } }
+        });
+
+        await new Promise(r => setTimeout(r, 800)); // Aguarda renderização
+
+        // Inserir Gráficos no PDF
+        const imgSetor = document.getElementById('canvasSetor').toDataURL('image/png');
+        const imgFunc = document.getElementById('canvasFunc').toDataURL('image/png');
         
+        doc.setFontSize(10); doc.setTextColor(0);
+        doc.text("Análise por Setor:", 20, 55);
+        doc.addImage(imgSetor, 'PNG', 20, 60, 70, 70);
+        
+        doc.text("Análise por Funcionário:", 110, 55);
+        doc.addImage(imgFunc, 'PNG', 110, 60, 70, 70);
+        
+        // Tabelas Detalhadas
         let yPos = 140;
         const setoresUnicos = [...new Set(logsPeriodo.map(l => l.setor))];
 
         setoresUnicos.forEach(setor => {
             if (yPos > 240) { doc.addPage(); yPos = 20; }
             doc.setTextColor(77, 0, 17); doc.setFontSize(12);
-            doc.text(`SETOR: ${setor} | TOTAL GASTO NO PERÍODO: R$ ${gastosPorSetor[setor].toFixed(2)}`, 15, yPos);
+            doc.text(`SETOR: ${setor} | TOTAL: R$ ${gastosPorSetor[setor].toFixed(2)}`, 15, yPos);
             
             const logsSetor = logsPeriodo.filter(l => l.setor === setor);
             doc.autoTable({
@@ -505,7 +521,7 @@
             yPos = doc.lastAutoTable.finalY + 15;
         });
 
-        doc.save(`Balanço_Setorial_V92.pdf`);
+        doc.save(`Relatorio_Analitico_V92.pdf`);
     }
 
     async function gerarRelatorioAluguel() {
