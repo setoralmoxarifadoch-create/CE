@@ -3,227 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMOXARIFADO INTELLIGENT V9.3 - J. GUILHERME</title>
+    <title>ALMOXARIFADO INTELLIGENT V9.4 - J. GUILHERME</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     
     <style>
         :root { 
-            --vinho: #5a0015; 
-            --vinho-glow: #ff2e63;
-            --bg-dark: #0a0f1a; 
-            --card-dark: #161e2d; 
-            --border: #2d3748; 
+            --vinho: #4d0011; 
+            --vinho-brilhante: #f43f5e;
+            --bg-body: #0f172a; 
+            --bg-card: #1e293b; 
         }
         
         body { 
-            background-color: var(--bg-dark); 
+            background-color: var(--bg-body); 
             color: #f1f5f9; 
             font-family: 'Inter', sans-serif; 
-            font-size: 13px; /* Fonte 13px conforme solicitado */
-            -webkit-user-select: none; 
+            font-size: 13px; 
             user-select: none; 
         }
 
-        /* Inputs Profissionais */
-        input, select, textarea {
-            background-color: #0f172a !important;
-            color: #f8fafc !important;
-            border: 1px solid var(--border) !important;
-            padding: 10px !important;
+        .font-13 { font-size: 13px; }
+        .text-vinho { color: var(--vinho-brilhante); }
+        .bg-vinho { background-color: var(--vinho); }
+
+        input, select { 
+            background-color: #0b1120 !important; 
+            color: #f8fafc !important; 
+            border: 1px solid #334155 !important; 
             border-radius: 8px !important;
-            outline: none !important;
-            transition: all 0.2s;
+            padding: 8px 12px !important;
         }
-        input:focus { border-color: var(--vinho-glow) !important; box-shadow: 0 0 0 2px rgba(255, 46, 99, 0.2); }
 
         .card-glass { 
-            background: var(--card-dark); 
-            border: 1px solid var(--border); 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            background: var(--bg-card); 
+            border: 1px solid #334155; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .btn-vinho { background: var(--vinho); color: white; font-weight: 800; text-transform: uppercase; transition: 0.3s; }
-        .btn-vinho:hover { background: #800020; transform: translateY(-1px); }
+        .status-alerta { 
+            background: #991b1b; 
+            color: #fee2e2; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-weight: 800; 
+            animation: pulse 1.5s infinite; 
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        .status-repor { background: #991b1b; color: #fecaca; padding: 2px 8px; border-radius: 6px; font-weight: 800; animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-        .search-results { position: absolute; z-index: 100; width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 8px; max-height: 250px; overflow-y: auto; margin-top: 5px; }
-        
-        .signature { position: fixed; bottom: 8px; right: 15px; font-size: 10px; color: #64748b; font-weight: 700; opacity: 0.5; }
         .hidden { display: none !important; }
-
-        /* Estilo da Tabela */
-        table { border-collapse: separate; border-spacing: 0 8px; }
-        tr.row-item { background: #1e293b; transition: 0.2s; }
-        tr.row-item:hover { background: #2d3748; }
-        td { padding: 12px !important; }
-        td:first-child { border-radius: 12px 0 0 12px; }
-        td:last-child { border-radius: 0 12px 12px 0; }
+        .signature { position: fixed; bottom: 5px; right: 10px; font-size: 10px; color: #475569; font-weight: bold; }
+        
+        /* Estilo Capa Facebook */
+        .banner-capa {
+            height: 220px;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 1)), 
+                        url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            border-bottom: 2px solid var(--vinho);
+        }
     </style>
 </head>
 <body>
 
-<div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#050810]">
-    <div class="card-glass p-10 w-96 text-center border-t-4 border-[#5a0015]">
-        <div class="text-4xl mb-4">🔐</div>
-        <h2 class="text-white font-black text-2xl mb-1 uppercase tracking-tighter italic">SISTEMA V9.3</h2>
-        <p class="text-slate-500 text-[10px] mb-8 font-bold tracking-[0.3em] uppercase">Produced by J Guilherme</p>
-        <input type="password" id="pin-input" placeholder="DIGITE SEU PIN" class="w-full text-center text-2xl mb-6 tracking-[10px]">
-        <button onclick="autenticar()" class="w-full btn-vinho p-4 rounded-xl shadow-lg">Entrar no Terminal</button>
+<div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#020617]">
+    <div class="card-glass p-8 w-80 text-center border-t-4 border-red-900">
+        <h2 class="text-white font-black text-2xl mb-1 italic">MASTER V9.4</h2>
+        <p class="text-slate-500 text-[10px] mb-6 font-bold tracking-widest uppercase">By J Guilherme</p>
+        <input type="password" id="pin-input" placeholder="DIGITE O PIN" class="w-full text-center text-2xl mb-6">
+        <button onclick="autenticar()" class="w-full bg-vinho text-white p-3 rounded-lg font-black uppercase hover:bg-red-900 transition">Entrar</button>
     </div>
 </div>
 
-<div id="app" class="hidden max-w-[98%] mx-auto pb-10">
-    
-    <div class="relative w-full h-56 md:h-72 rounded-b-[40px] overflow-hidden shadow-2xl mb-10 border-b-2 border-slate-800">
-        <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=2070" alt="Capa" class="w-full h-full object-cover opacity-30">
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-        
-        <div class="absolute bottom-8 left-10 flex items-end gap-6">
-            <div class="w-28 h-28 md:w-36 md:h-36 rounded-3xl border-4 border-[#0a0f1a] overflow-hidden bg-vinho flex items-center justify-center shadow-2xl transform -rotate-2">
-                <span class="text-6xl">🏢</span>
+<div id="app" class="hidden">
+    <div class="banner-capa mb-8">
+        <div class="max-w-[95%] mx-auto h-full flex items-end pb-6 gap-6">
+            <div class="w-24 h-24 md:w-32 md:h-32 bg-vinho border-4 border-[#0f172a] rounded-2xl flex items-center justify-center text-5xl shadow-2xl">📦</div>
+            <div>
+                <h1 class="text-2xl md:text-4xl font-black text-white italic tracking-tighter">Almoxarifado Intelligence</h1>
+                <p id="clock" class="text-xs font-mono text-red-400 font-bold"></p>
             </div>
-            <div class="pb-2">
-                <h1 class="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tighter drop-shadow-2xl">Almoxarifado Intelligence</h1>
-                <p id="clock" class="text-sm font-mono text-vinho-glow font-bold mt-2"></p>
+            <div class="ml-auto flex gap-2">
+                <button onclick="fazerBackup()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-[10px] uppercase shadow-lg">💾 Backup</button>
+                <button onclick="document.getElementById('import-f').click()" class="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold text-[10px] uppercase shadow-lg">Restaurar</button>
+                <input type="file" id="import-f" onchange="importarBackup(event)" class="hidden">
             </div>
-        </div>
-
-        <div class="absolute top-8 right-10 flex gap-3">
-            <button onclick="fazerBackup()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-black text-[11px] uppercase border border-blue-400 shadow-xl hover:bg-blue-500">💾 Exportar Dados</button>
-            <button onclick="document.getElementById('import-f').click()" class="bg-slate-700 text-white px-5 py-2.5 rounded-xl font-black text-[11px] uppercase border border-slate-500 shadow-xl hover:bg-slate-600">Restaurar</button>
-            <input type="file" id="import-f" onchange="importarBackup(event)" class="hidden">
         </div>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 px-4">
-        <div class="card-glass p-5 border-l-4 border-red-600">
-            <p class="text-slate-400 text-[10px] font-black uppercase">Críticos / Reposição</p>
-            <h2 id="dash-criticos" class="text-4xl font-black text-red-500">0</h2>
-        </div>
-        <div class="card-glass p-5 border-l-4 border-blue-600">
-            <p class="text-slate-400 text-[10px] font-black uppercase">Movimentos (7 dias)</p>
-            <h2 id="dash-saidas" class="text-4xl font-black text-blue-500">0</h2>
-        </div>
-        <div class="card-glass p-5 border-l-4 border-green-600">
-            <p class="text-slate-400 text-[10px] font-black uppercase">Estoque Total</p>
-            <h2 id="dash-total" class="text-4xl font-black text-green-500">0</h2>
-        </div>
-        <div class="card-glass p-5 border-l-4 border-amber-600">
-            <p class="text-slate-400 text-[10px] font-black uppercase">Aluguéis Ativos</p>
-            <h2 id="dash-aluguel" class="text-4xl font-black text-amber-500">0</h2>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4">
+    <div class="max-w-[95%] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <div class="lg:col-span-4 space-y-8">
-            
-            <div class="card-glass p-6 border-t-4 border-vinho">
-                <h3 id="form-title" class="font-black text-white mb-5 text-sm uppercase flex items-center gap-2">📦 Gestão de Produto</h3>
+        <div class="lg:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+            <div class="card-glass p-4 border-l-4 border-red-600">
+                <p class="text-slate-400 text-[9px] font-black uppercase">Itens Críticos</p>
+                <h2 id="dash-criticos" class="text-3xl font-black text-red-500">0</h2>
+            </div>
+            <div class="card-glass p-4 border-l-4 border-blue-600">
+                <p class="text-slate-400 text-[9px] font-black uppercase">Movimentos (7d)</p>
+                <h2 id="dash-saidas" class="text-3xl font-black text-blue-500">0</h2>
+            </div>
+            <div class="card-glass p-4 border-l-4 border-green-600">
+                <p class="text-slate-400 text-[9px] font-black uppercase">Saldo Geral</p>
+                <h2 id="dash-total" class="text-3xl font-black text-green-500">0</h2>
+            </div>
+            <div class="card-glass p-4 border-l-4 border-amber-600">
+                <p class="text-slate-400 text-[9px] font-black uppercase">Aluguéis Ativos</p>
+                <h2 id="dash-aluguel" class="text-3xl font-black text-amber-500">0</h2>
+            </div>
+        </div>
+
+        <div id="painel-pendencias" class="lg:col-span-12 hidden">
+            <h3 class="font-black text-red-500 mb-3 text-xs uppercase italic flex items-center gap-2">⚠️ FERRAMENTAS EM USO (PENDENTES)</h3>
+            <div id="lista-pendencias" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4"></div>
+        </div>
+
+        <div class="lg:col-span-4 space-y-6">
+            <div class="card-glass p-5">
+                <h3 id="form-title" class="font-black text-white mb-4 text-[11px] uppercase italic">📝 Gestão de Produto</h3>
                 <input type="hidden" id="edit-id">
-                <div class="space-y-4">
+                <div class="space-y-3">
                     <input type="text" id="p-nome" placeholder="NOME DO MATERIAL" class="w-full font-bold uppercase">
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-2">
                         <select id="p-tipo" class="font-bold uppercase">
                             <option value="Insumo">Insumo (📦)</option>
                             <option value="Ferramenta">Ferramenta (🛠️)</option>
                         </select>
-                        <input type="number" id="p-min" placeholder="ESTOQUE MÍN" class="text-center font-bold">
+                        <input type="number" id="p-min" placeholder="MÍNIMO" class="font-bold text-center">
                     </div>
-                    <div id="div-qtd-inicial">
-                        <input type="number" id="p-qtd" placeholder="QUANTIDADE INICIAL" class="w-full text-center text-xl font-black text-vinho-glow">
-                    </div>
-                    <div>
-                        <input type="number" step="0.01" id="p-valor" placeholder="VALOR UNITÁRIO (R$)" class="w-full text-center font-bold text-green-500">
-                    </div>
+                    <div id="div-qtd-inicial"><input type="number" id="p-qtd" placeholder="QTD INICIAL" class="w-full text-center text-xl font-black"></div>
+                    <input type="number" step="0.01" id="p-valor" placeholder="VALOR UN. (R$)" class="w-full text-center font-bold text-green-500">
                     <div class="flex gap-2">
-                        <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 btn-vinho p-4 rounded-xl text-xs">Salvar Material</button>
-                        <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-slate-600 px-6 rounded-xl font-black">X</button>
+                        <button onclick="salvarProduto()" id="btn-salvar" class="flex-1 bg-vinho p-3 rounded-lg font-black uppercase text-xs">Salvar</button>
+                        <button onclick="cancelarEdicao()" id="btn-cancelar" class="hidden bg-slate-600 px-4 rounded-lg font-black text-xs">X</button>
                     </div>
                 </div>
             </div>
 
-            <div class="card-glass p-6 border-t-4 border-blue-600">
-                <h3 class="font-black text-white mb-5 text-sm uppercase">⚡ Movimentação</h3>
-                <div class="space-y-4">
+            <div class="card-glass p-5 border-t-4 border-blue-900">
+                <h3 class="font-black text-blue-400 mb-4 text-[11px] uppercase italic">⚡ Registrar Movimento</h3>
+                <div class="space-y-3">
                     <div class="relative">
-                        <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full font-black italic">
-                        <div id="lista-busca" class="search-results hidden"></div>
+                        <input type="text" id="m-busca-item" onkeyup="buscarItemMovimento(this.value)" placeholder="🔍 BUSCAR ITEM..." class="w-full font-bold italic">
+                        <div id="lista-busca" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded-lg max-h-40 overflow-y-auto hidden"></div>
                     </div>
                     <input type="hidden" id="m-id-selecionado">
-                    <div class="grid grid-cols-2 gap-3">
-                        <select id="m-op" class="font-black text-vinho-glow uppercase">
-                            <option value="saida">Retirada (-)</option>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="m-op" class="font-black uppercase text-red-500">
+                            <option value="saida">Saída (-)</option>
                             <option value="entrada">Entrada (+)</option>
                         </select>
-                        <input type="number" id="m-qtd" placeholder="QTD" class="text-center text-xl font-black">
+                        <input type="number" id="m-qtd" placeholder="QTD" class="font-bold text-center">
                     </div>
                     <input type="text" id="m-nome" placeholder="NOME DO RESPONSÁVEL" class="w-full font-bold uppercase">
                     <select id="m-setor" class="w-full font-bold uppercase"></select>
-                    <input type="number" step="0.01" id="m-valor-mov" placeholder="VALOR DA OP (OPCIONAL)" class="w-full text-center font-bold text-green-500">
-                    <button onclick="executarMovimento()" class="w-full bg-green-600 text-white p-4 rounded-xl font-black uppercase shadow-lg hover:bg-green-500 transition">Confirmar Movimento</button>
+                    <input type="number" step="0.01" id="m-valor-mov" placeholder="VALOR DA OPERAÇÃO (R$)" class="w-full text-center font-bold text-green-500">
+                    <button onclick="executarMovimento()" class="w-full bg-green-700 p-3 rounded-lg font-black uppercase text-xs shadow-lg">Confirmar</button>
                 </div>
             </div>
 
-            <div class="card-glass p-6">
-                <h3 class="font-black text-white mb-4 text-xs uppercase opacity-70">⚙️ Gerenciar Setores</h3>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="novo-setor" placeholder="NOME DO SETOR..." class="flex-1 font-bold uppercase text-[11px]">
-                    <button onclick="adicionarSetor()" class="bg-slate-700 px-4 rounded-xl font-black text-xl hover:bg-slate-600">+</button>
+            <div class="card-glass p-5">
+                <h3 class="font-black text-slate-400 mb-3 text-[10px] uppercase">⚙️ Setores</h3>
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="novo-setor" placeholder="NOVO SETOR..." class="flex-1 text-[10px] uppercase font-bold">
+                    <button onclick="adicionarSetor()" class="bg-slate-700 px-3 rounded-lg font-black">+</button>
                 </div>
                 <div id="lista-setores-badges" class="flex flex-wrap gap-2"></div>
             </div>
 
-            <div class="card-glass p-6 border-t-4 border-amber-600">
-                <h3 class="font-black text-white mb-5 text-sm uppercase">🤝 Controle de Aluguéis</h3>
-                <div class="space-y-3">
-                    <input type="text" id="aluguel-item" placeholder="EQUIPAMENTO / MÁQUINA" class="w-full font-bold uppercase">
+            <div class="card-glass p-5 border-t-4 border-amber-900">
+                <h3 class="font-black text-amber-500 mb-4 text-[11px] uppercase italic">🤝 Aluguéis</h3>
+                <div class="space-y-2 mb-4">
+                    <input type="text" id="aluguel-item" placeholder="EQUIPAMENTO" class="w-full text-[11px] uppercase font-bold">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="date" id="aluguel-data" class="text-[11px]">
-                        <input type="text" id="aluguel-fornecedor" placeholder="FORNECEDOR" class="font-bold uppercase">
+                        <input type="date" id="aluguel-data" class="text-[10px]">
+                        <input type="text" id="aluguel-fornecedor" placeholder="FORNECEDOR" class="text-[10px] uppercase font-bold">
                     </div>
-                    <input type="number" step="0.01" id="aluguel-valor" placeholder="VALOR DO ALUGUEL (R$)" class="w-full font-bold text-amber-500">
-                    <button onclick="registrarAluguel()" class="w-full bg-amber-600 text-white p-3 rounded-xl font-black uppercase text-xs hover:bg-amber-500">Registrar Aluguel</button>
+                    <input type="number" step="0.01" id="aluguel-valor" placeholder="R$ ALUGUEL" class="w-full text-[11px] font-bold text-amber-500">
+                    <button onclick="registrarAluguel()" class="w-full bg-amber-700 text-white p-2 rounded-lg font-black text-[10px] uppercase">Registrar</button>
                 </div>
-                <div id="lista-alugueis-container" class="mt-5 space-y-2 max-h-40 overflow-y-auto"></div>
+                <div id="lista-alugueis" class="space-y-2 max-h-32 overflow-y-auto"></div>
             </div>
-
         </div>
 
-        <div class="lg:col-span-8">
+        <div class="lg:col-span-8 space-y-6">
             
-            <div class="card-glass p-6 mb-8 flex flex-wrap items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <span class="font-black text-[10px] uppercase text-slate-500">Período Relatório:</span>
-                    <input type="date" id="filtro-inicio" class="text-xs">
-                    <input type="date" id="filtro-fim" class="text-xs">
+            <div class="card-glass p-4 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-[10px] uppercase text-slate-500">Período:</span>
+                    <input type="date" id="filtro-inicio" class="text-[10px]">
+                    <input type="date" id="filtro-fim" class="text-[10px]">
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="gerarRelatorioPDFProfissional()" class="bg-white text-black px-6 py-3 rounded-xl font-black text-[11px] uppercase shadow-xl hover:scale-105 transition">📊 PDF Por Setores</button>
-                </div>
+                <button onclick="gerarRelatorioSetorPDF()" class="bg-white text-black px-4 py-2 rounded-lg font-black text-[10px] uppercase shadow-lg hover:scale-105 transition">📊 Gerar PDF Por Setores</button>
             </div>
 
             <div class="card-glass overflow-hidden">
-                <div class="p-6 bg-slate-900/50 border-b border-slate-700">
-                    <h3 class="font-black text-white text-xs uppercase mb-4 tracking-widest italic">📦 Monitor de Saldo Real</h3>
-                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 PESQUISAR MATERIAL NO ESTOQUE..." class="w-full bg-slate-950 p-4 rounded-xl border border-slate-700 font-bold">
+                <div class="p-4 bg-slate-900/50 border-b border-slate-700">
+                    <input type="text" id="busca-geral" onkeyup="render()" placeholder="🔍 PESQUISAR NO ESTOQUE..." class="w-full bg-slate-950 font-bold">
                 </div>
-                <div class="overflow-x-auto p-4">
+                <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
-                            <tr class="text-[10px] uppercase text-slate-500 font-black tracking-widest border-b border-slate-800">
-                                <th class="p-4">Descrição do Material</th>
+                            <tr class="text-[10px] uppercase text-slate-500 font-black border-b border-slate-800">
+                                <th class="p-4">Material</th>
                                 <th class="p-4 text-center">Tipo</th>
                                 <th class="p-4 text-center">Saldo</th>
                                 <th class="p-4 text-center">Status</th>
-                                <th class="p-4 text-right">Opções</th>
+                                <th class="p-4 text-right">Ação</th>
                             </tr>
                         </thead>
                         <tbody id="lista-corpo"></tbody>
@@ -231,23 +223,23 @@
                 </div>
             </div>
 
-            <div class="mt-8 card-glass p-6">
-                <h3 class="font-black text-slate-400 mb-5 text-[10px] uppercase italic">⚡ Atividades Recentes do Sistema</h3>
+            <div class="card-glass p-5">
+                <h3 class="font-black text-slate-400 mb-4 text-[10px] uppercase italic">⚡ Atividades Recentes (Log)</h3>
                 <div id="historico-lista" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="signature">PRODUCED BY J GUILHERME A.C. | V9.3 DARK ELITE</div>
+<div class="signature">PRODUCED BY J GUILHERME A.C. | V9.4 PROFESSIONAL</div>
 
 <script>
-    /* === LÓGICA BLINDADA E RESTAURADA === */
     const PIN = "0000"; 
-    let produtos = JSON.parse(localStorage.getItem('almox_v93_prods')) || [];
-    let logs = JSON.parse(localStorage.getItem('almox_v93_logs')) || [];
-    let setores = JSON.parse(localStorage.getItem('almox_v93_setores')) || ["PRODUÇÃO", "MANUTENÇÃO", "ADMINISTRATIVO"];
-    let alugueis = JSON.parse(localStorage.getItem('almox_v93_alugueis')) || [];
+    let produtos = JSON.parse(localStorage.getItem('almox_v94_prods')) || [];
+    let logs = JSON.parse(localStorage.getItem('almox_v94_logs')) || [];
+    let setores = JSON.parse(localStorage.getItem('almox_v94_setores')) || ["PRODUÇÃO", "MANUTENÇÃO"];
+    let alugueis = JSON.parse(localStorage.getItem('almox_v94_alugueis')) || [];
+    let pendencias = JSON.parse(localStorage.getItem('almox_v94_pend')) || [];
 
     window.onload = () => {
         const hoje = new Date();
@@ -262,32 +254,28 @@
         if(document.getElementById('pin-input').value === PIN) {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
-            render(); renderAlugueis();
-        } else { alert("ACESSO NEGADO"); }
+            render(); renderAlugueis(); renderPendencias();
+        } else { alert("PIN INCORRETO"); }
     }
 
     function atualizarSelectSetores() {
         const select = document.getElementById('m-setor');
         const container = document.getElementById('lista-setores-badges');
-        select.innerHTML = '<option value="">-- SELECIONAR SETOR --</option>';
+        select.innerHTML = '<option value="">-- SELECIONE O SETOR --</option>';
         container.innerHTML = '';
         setores.forEach((s, i) => {
             select.innerHTML += `<option value="${s}">${s}</option>`;
-            container.innerHTML += `<span class="bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-black border border-slate-700 flex items-center gap-2">${s} <button onclick="removerSetor(${i})" class="text-red-500 font-bold">×</button></span>`;
+            container.innerHTML += `<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-[9px] font-bold border border-slate-700 flex items-center gap-2">${s} <button onclick="removerSetor(${i})" class="text-red-500">×</button></span>`;
         });
-        localStorage.setItem('almox_v93_setores', JSON.stringify(setores));
+        localStorage.setItem('almox_v94_setores', JSON.stringify(setores));
     }
 
     function adicionarSetor() {
         const nome = document.getElementById('novo-setor').value.toUpperCase().trim();
-        if(nome && !setores.includes(nome)) {
-            setores.push(nome);
-            document.getElementById('novo-setor').value = '';
-            atualizarSelectSetores();
-        }
+        if(nome && !setores.includes(nome)) { setores.push(nome); document.getElementById('novo-setor').value = ''; atualizarSelectSetores(); }
     }
 
-    function removerSetor(i) { if(confirm("Remover setor?")) { setores.splice(i,1); atualizarSelectSetores(); } }
+    function removerSetor(i) { if(confirm("Excluir setor?")) { setores.splice(i,1); atualizarSelectSetores(); } }
 
     function salvarProduto() {
         const id = document.getElementById('edit-id').value;
@@ -297,7 +285,7 @@
         const qtd = parseInt(document.getElementById('p-qtd').value) || 0;
         const valor = parseFloat(document.getElementById('p-valor').value) || 0;
 
-        if(!nome) return alert("Nome obrigatório");
+        if(!nome) return alert("Nome é obrigatório!");
 
         if(id) {
             const idx = produtos.findIndex(p => p.id == id);
@@ -313,10 +301,9 @@
         if (v.length < 1) { lista.classList.add('hidden'); return; }
         const filtrados = produtos.filter(p => p.nome.toLowerCase().includes(v.toLowerCase()));
         lista.innerHTML = filtrados.map(p => `
-            <div class="p-3 hover:bg-slate-700 cursor-pointer border-b border-slate-600 flex justify-between font-bold text-xs" 
+            <div class="p-3 hover:bg-slate-700 cursor-pointer border-b border-slate-600 text-[11px] flex justify-between font-bold" 
                  onclick="selecionarParaMov(${p.id}, '${p.nome}')">
-                <span>${p.nome}</span>
-                <span class="text-vinho-glow">SALDO: ${p.qtd}</span>
+                <span>${p.nome}</span> <span class="text-red-400">SALDO: ${p.qtd}</span>
             </div>`).join('');
         lista.classList.remove('hidden');
     }
@@ -335,14 +322,17 @@
         const resp = document.getElementById('m-nome').value.toUpperCase();
         const vMov = parseFloat(document.getElementById('m-valor-mov').value) || 0;
 
-        if(!id || !qtd || !setor || !resp) return alert("Preencha todos os campos!");
+        if(!id || !qtd || !setor || !resp) return alert("Dados incompletos!");
 
         const p = produtos.find(item => item.id == id);
         const valorFinal = vMov > 0 ? vMov : (p.valor * qtd);
 
         if(op === 'saida') {
-            if(p.qtd < qtd) return alert("ESTOQUE INSUFICIENTE!");
+            if(p.qtd < qtd) return alert("SEM ESTOQUE!");
             p.qtd -= qtd;
+            if(p.tipo === 'Ferramenta') {
+                pendencias.push({ id: Date.now(), prodId: p.id, prodNome: p.nome, qtd, resp, setor, data: new Date().toLocaleString() });
+            }
         } else {
             p.qtd += qtd;
         }
@@ -358,44 +348,32 @@
             valor: valorFinal 
         });
         
-        salvar();
+        salvar(); renderPendencias();
         document.getElementById('m-busca-item').value = '';
         document.getElementById('m-qtd').value = '';
-        document.getElementById('m-nome').value = '';
     }
 
-    function registrarAluguel() {
-        const item = document.getElementById('aluguel-item').value.toUpperCase();
-        const data = document.getElementById('aluguel-data').value;
-        const fornc = document.getElementById('aluguel-fornecedor').value.toUpperCase();
-        const valor = parseFloat(document.getElementById('aluguel-valor').value) || 0;
-
-        if(!item || !data) return alert("Preencha Item e Data!");
-        alugueis.push({ id: Date.now(), item, data, fornc, valor, status: 'ATIVO' });
-        localStorage.setItem('almox_v93_alugueis', JSON.stringify(alugueis));
-        document.getElementById('aluguel-item').value = '';
-        renderAlugueis();
-    }
-
-    function renderAlugueis() {
-        const container = document.getElementById('lista-alugueis-container');
-        document.getElementById('dash-aluguel').innerText = alugueis.filter(a => a.status === 'ATIVO').length;
-        container.innerHTML = alugueis.map(a => `
-            <div class="bg-slate-800 p-3 rounded-xl border border-amber-900/30 flex justify-between items-center">
-                <div>
-                    <p class="font-black text-[10px] text-amber-500">${a.item}</p>
-                    <p class="text-[9px] text-slate-400">${a.data} | ${a.fornc}</p>
-                </div>
-                <button onclick="removerAluguel(${a.id})" class="text-red-500 font-black">×</button>
+    function renderPendencias() {
+        const painel = document.getElementById('painel-pendencias');
+        const lista = document.getElementById('lista-pendencias');
+        if(pendencias.length === 0) { painel.classList.add('hidden'); return; }
+        painel.classList.remove('hidden');
+        lista.innerHTML = pendencias.map(p => `
+            <div class="bg-red-950/40 p-3 rounded-xl border border-red-900/50 flex flex-col gap-2">
+                <p class="font-black text-xs text-red-400 uppercase">${p.prodNome} (${p.qtd})</p>
+                <p class="text-[9px] font-bold text-slate-400 uppercase">${p.resp} | ${p.setor}</p>
+                <button onclick="devolver(${p.id})" class="bg-green-700 text-white text-[9px] font-black p-1.5 rounded uppercase">Devolver</button>
             </div>`).join('');
     }
 
-    function removerAluguel(id) { 
-        if(confirm("Encerrar aluguel?")) {
-            alugueis = alugueis.filter(a => a.id !== id);
-            localStorage.setItem('almox_v93_alugueis', JSON.stringify(alugueis));
-            renderAlugueis();
-        }
+    function devolver(id) {
+        const idx = pendencias.findIndex(p => p.id === id);
+        const item = pendencias[idx];
+        const prod = produtos.find(x => x.id === item.prodId);
+        if(prod) prod.qtd += item.qtd;
+        logs.push({ t: Date.now(), data: new Date().toLocaleDateString('pt-BR'), tipo: 'DEVOLUÇÃO', prod: item.prodNome, qtd: item.qtd, setor: 'ALMOX', resp: item.resp, valor: 0 });
+        pendencias.splice(idx, 1);
+        salvar(); renderPendencias();
     }
 
     function render() {
@@ -409,14 +387,14 @@
             totalP += p.qtd;
             if(p.nome.toLowerCase().includes(busca)) {
                 let sTxt = "ESTOQUE OK", sCls = "text-green-500";
-                if(p.qtd <= p.min) { sTxt = "REPOR AGORA"; sCls = "status-repor"; criticos++; }
+                if(p.qtd <= p.min) { sTxt = "REPOR AGORA"; sCls = "status-alerta"; criticos++; }
                 corpo.innerHTML += `
-                    <tr class="row-item">
-                        <td class="font-black text-xs">${p.nome}<br><span class="text-[9px] text-slate-500">MÍN: ${p.min} | UN: R$ ${p.valor.toFixed(2)}</span></td>
-                        <td class="text-center"><span class="bg-slate-900 px-3 py-1 rounded-lg text-[9px] font-bold">${p.tipo}</span></td>
-                        <td class="text-center text-xl font-black text-vinho-glow">${p.qtd}</td>
-                        <td class="text-center"><span class="${sCls} text-[9px] font-black">${sTxt}</span></td>
-                        <td class="text-right"><button onclick="editarItem(${p.id})" class="text-blue-400 font-black hover:underline">EDITAR</button></td>
+                    <tr class="hover:bg-slate-800 border-b border-slate-800/50">
+                        <td class="p-4 font-black text-xs">${p.nome}<br><span class="text-[9px] text-slate-500 font-bold uppercase">VALOR UN: R$ ${p.valor.toFixed(2)}</span></td>
+                        <td class="text-center font-bold text-[10px] opacity-60">${p.tipo}</td>
+                        <td class="text-center text-xl font-black text-red-500">${p.qtd}</td>
+                        <td class="text-center"><span class="${sCls} text-[9px] font-black uppercase">${sTxt}</span></td>
+                        <td class="text-right"><button onclick="editarItem(${p.id})" class="text-blue-400 font-black hover:underline text-[10px]">EDITAR</button></td>
                     </tr>`;
             }
         });
@@ -425,19 +403,20 @@
         document.getElementById('dash-total').innerText = totalP;
         document.getElementById('dash-saidas').innerText = logs.filter(l => l.t > Date.now() - (7*24*60*60*1000)).length;
 
-        histDiv.innerHTML = logs.slice(-10).reverse().map(l => `
-            <div class="card-glass p-3 border-l-2 ${l.tipo==='SAIDA'?'border-red-500':'border-green-500'} flex justify-between items-center">
+        histDiv.innerHTML = logs.slice(-12).reverse().map(l => `
+            <div class="bg-slate-900/80 p-3 rounded-lg border-l-4 ${l.tipo==='SAIDA'?'border-red-600':'border-green-600'} flex justify-between items-center shadow-sm">
                 <div>
-                    <p class="font-black text-[10px]">${l.prod} (${l.qtd})</p>
-                    <p class="text-[9px] text-slate-500">${l.setor} | ${l.resp}</p>
+                    <p class="font-black text-[10px] text-slate-200 uppercase">${l.prod} (${l.qtd})</p>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase">${l.setor} | ${l.resp}</p>
                 </div>
-                <span class="text-[9px] font-mono opacity-40">${l.data}</span>
+                <span class="text-[9px] font-mono text-slate-600 font-bold">${l.data}</span>
             </div>`).join('');
     }
 
     function salvar() {
-        localStorage.setItem('almox_v93_prods', JSON.stringify(produtos));
-        localStorage.setItem('almox_v93_logs', JSON.stringify(logs));
+        localStorage.setItem('almox_v94_prods', JSON.stringify(produtos));
+        localStorage.setItem('almox_v94_logs', JSON.stringify(logs));
+        localStorage.setItem('almox_v94_pend', JSON.stringify(pendencias));
         render();
     }
 
@@ -449,7 +428,7 @@
         document.getElementById('p-tipo').value = p.tipo;
         document.getElementById('p-valor').value = p.valor;
         document.getElementById('div-qtd-inicial').classList.add('hidden');
-        document.getElementById('form-title').innerText = "✏️ Editando: " + p.nome;
+        document.getElementById('form-title').innerText = "✏️ EDITAR: " + p.nome;
         document.getElementById('btn-cancelar').classList.remove('hidden');
         window.scrollTo(0, 400);
     }
@@ -457,83 +436,96 @@
     function cancelarEdicao() {
         document.getElementById('edit-id').value = "";
         document.getElementById('div-qtd-inicial').classList.remove('hidden');
-        document.getElementById('form-title').innerText = "📦 Gestão de Produto";
+        document.getElementById('form-title').innerText = "📝 GESTÃO DE PRODUTO";
         document.getElementById('p-nome').value = "";
         document.getElementById('btn-cancelar').classList.add('hidden');
     }
 
+    function registrarAluguel() {
+        const item = document.getElementById('aluguel-item').value.toUpperCase();
+        const data = document.getElementById('aluguel-data').value;
+        const fornc = document.getElementById('aluguel-fornecedor').value.toUpperCase();
+        const valor = parseFloat(document.getElementById('aluguel-valor').value) || 0;
+        if(!item || !data) return;
+        alugueis.push({ id: Date.now(), item, data, fornc, valor, status: 'ATIVO' });
+        localStorage.setItem('almox_v94_alugueis', JSON.stringify(alugueis));
+        renderAlugueis();
+    }
+
+    function renderAlugueis() {
+        const list = document.getElementById('lista-alugueis');
+        document.getElementById('dash-aluguel').innerText = alugueis.length;
+        list.innerHTML = alugueis.map(a => `
+            <div class="bg-slate-900 p-2 rounded border border-amber-900/30 flex justify-between items-center text-[10px]">
+                <span class="font-bold text-amber-500">${a.item}</span>
+                <button onclick="removerAluguel(${a.id})" class="text-red-500 font-bold">×</button>
+            </div>`).join('');
+    }
+
+    function removerAluguel(id) { 
+        alugueis = alugueis.filter(a => a.id !== id); 
+        localStorage.setItem('almox_v94_alugueis', JSON.stringify(alugueis)); 
+        renderAlugueis(); 
+    }
+
+    function gerarRelatorioSetorPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const dIni = document.getElementById('filtro-inicio').value;
+        const dFim = document.getElementById('filtro-fim').value;
+
+        doc.setFontSize(16); doc.text("BALANÇO DE MOVIMENTAÇÃO POR SETOR", 14, 20);
+        doc.setFontSize(10); doc.text(`FILTRO: ${dIni} A ${dFim}`, 14, 28);
+
+        const agrupado = {};
+        logs.filter(l => {
+            const date = l.data.split('/').reverse().join('-');
+            return date >= dIni && date <= dFim;
+        }).forEach(l => {
+            if(!agrupado[l.setor]) agrupado[l.setor] = { rows: [], total: 0 };
+            agrupado[l.setor].rows.push([l.data, l.prod, l.tipo, l.qtd, `R$ ${l.valor.toFixed(2)}`]);
+            agrupado[l.setor].total += l.valor;
+        });
+
+        let currentY = 35;
+        for (const setor in agrupado) {
+            if(currentY > 240) { doc.addPage(); currentY = 20; }
+            doc.setFillColor(60, 0, 10); doc.rect(14, currentY, 182, 7, 'F');
+            doc.setTextColor(255); doc.setFont("helvetica", "bold");
+            doc.text(`SETOR: ${setor}`, 16, currentY + 5);
+            
+            doc.autoTable({
+                startY: currentY + 8,
+                head: [['Data', 'Item', 'Op', 'Qtd', 'Custo']],
+                body: agrupado[setor].rows,
+                theme: 'grid',
+                headStyles: { fillColor: [30, 30, 30] },
+                styles: { fontSize: 8 }
+            });
+            
+            currentY = doc.lastAutoTable.finalY + 6;
+            doc.setTextColor(0); doc.text(`SUBTOTAL ${setor}: R$ ${agrupado[setor].total.toFixed(2)}`, 135, currentY);
+            currentY += 10;
+        }
+        doc.save(`RELATORIO_SETORIAL_${new Date().toLocaleDateString()}.pdf`);
+    }
+
     function fazerBackup() {
-        const d = { prods: produtos, logs, setores, alugueis };
+        const d = { prods: produtos, logs, setores, alugueis, pend: pendencias };
         const blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `ALMOX_V93_FULL_BKP.json`; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `BACKUP_ALMOX_V94.json`; a.click();
     }
 
     function importarBackup(e) {
         const r = new FileReader();
         r.onload = (ev) => {
             const d = JSON.parse(ev.target.result);
-            produtos = d.prods; logs = d.logs; setores = d.setores; alugueis = d.alugueis;
+            produtos = d.prods; logs = d.logs; setores = d.setores; alugueis = d.alugueis; pendencias = d.pend;
             salvar(); location.reload();
         };
         r.readAsText(e.target.files[0]);
     }
-
-    /* === GERADOR DE PDF PROFISSIONAL POR SETORES E VALORES === */
-    function gerarRelatorioPDFProfissional() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const dataInicio = document.getElementById('filtro-inicio').value;
-        const dataFim = document.getElementById('filtro-fim').value;
-
-        doc.setFontSize(18);
-        doc.text("BALANÇO POR SETOR - ALMOXARIFADO V9.3", 14, 20);
-        doc.setFontSize(10);
-        doc.text(`Período: ${dataInicio} até ${dataFim}`, 14, 28);
-
-        // Agrupar logs por setor
-        const agrupado = {};
-        logs.filter(l => {
-            const d = l.data.split('/').reverse().join('-');
-            return d >= dataInicio && d <= dataFim;
-        }).forEach(l => {
-            if(!agrupado[l.setor]) agrupado[l.setor] = { itens: [], total: 0 };
-            agrupado[l.setor].itens.push([l.data, l.prod, l.tipo, l.qtd, `R$ ${l.valor.toFixed(2)}`]);
-            agrupado[l.setor].total += l.valor;
-        });
-
-        let yPos = 35;
-        for (const setor in agrupado) {
-            doc.setFont("helvetica", "bold");
-            doc.setFillColor(90, 0, 21);
-            doc.rect(14, yPos, 182, 7, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.text(`SETOR: ${setor}`, 16, yPos + 5);
-            
-            doc.autoTable({
-                startY: yPos + 8,
-                head: [['Data', 'Material', 'Operação', 'Qtd', 'Custo Acum.']],
-                body: agrupado[setor].itens,
-                theme: 'grid',
-                headStyles: { fillColor: [40, 40, 40] },
-                styles: { fontSize: 8 }
-            });
-            
-            yPos = doc.lastAutoTable.finalY + 5;
-            doc.setTextColor(0, 0, 0);
-            doc.text(`TOTAL DO SETOR ${setor}: R$ ${agrupado[setor].total.toFixed(2)}`, 140, yPos);
-            yPos += 10;
-            
-            if(yPos > 250) { doc.addPage(); yPos = 20; }
-        }
-
-        doc.save(`Relatorio_Setorial_${new Date().toLocaleDateString()}.pdf`);
-    }
-
-    document.onkeydown = function(e) {
-        if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) return false;
-    };
 </script>
 </body>
 </html>
